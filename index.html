@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Organizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h2>Players</h2>
+        <div id="players">
+        </div>
+    </main>
+
+    <button id="btn-criar">Adicionar Personagem</button>
+
+    <div id="criando-player">
+        <h2>Adicionando Personagem</h2>
+        <p><input type="text" id="nome" placeholder="nome"></p>
+        <p><input type="number" id="vida" placeholder="vida"></p>
+
+        <button id="salvar">Salvar</button>
+        <button id="cancelar">Cancelar</button>
+    </div>
+
+    <button id="btn-combate">Iniciar Combate</button>
+
+    <div id="combate"> 
+        <h2 id="rodada">Rodada 0</h2>
+        <button id="btn-passar">Passar Rodada</button>
+        <button id="btn-finalizar">Finalizar Combate</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
