@@ -6,8 +6,9 @@ let cont = 0;
 // Abstração do HTML
 let player = document.getElementById('players');
 let salvar = document.getElementById('salvar');
+let cancelar = document.getElementById('cancelar');
 let comb = document.getElementById('combate');
-let add = document.getElementById('criando-player');
+let addPlayer = document.getElementById('criando-player');
 let btnCriar = document.getElementById('btn-criar');
 let btnCombate = document.getElementById('btn-combate');
 let btnPassar = document.getElementById('btn-passar');
@@ -17,6 +18,7 @@ let btnFinalizar = document.getElementById('btn-finalizar')
 function proxRodada (array)
 {
     let rodada = document.getElementById('rodada');
+    let rodadaPlayer = document.getElementById('rodada-player');
     contRodada++;
     rodada.innerHTML = `Rodada ${contRodada}`;
 
@@ -28,12 +30,13 @@ function proxRodada (array)
     {
         cont++;
     }
-    console.log("Vez de " + array[cont - 1]);
+    rodadaPlayer.innerHTML = `Vez de ${array[cont - 1]}`;
 }
 
 // Eventos de botões
 btnCriar.addEventListener('click', () => {
-    add.style.display = 'inline';
+    addPlayer.style.display = 'block';
+    document.body.classList.add('blur-active');
 })
 
 salvar.addEventListener('click', () => {
@@ -45,7 +48,13 @@ salvar.addEventListener('click', () => {
     iniciativa.push(nome);
     document.getElementById('nome').value = '';
     document.getElementById('vida').value = '';
-    add.style.display = 'none';
+    addPlayer.style.display = 'none';
+    document.body.classList.remove('blur-active');
+})
+
+cancelar.addEventListener('click', () => {
+    addPlayer.style.display = 'none';
+    document.body.classList.remove('blur-active');
 })
 
 btnCombate.addEventListener('click', () => {
@@ -55,7 +64,7 @@ btnCombate.addEventListener('click', () => {
     }
     comb.style.display = 'inline';
     proxRodada(iniciativa)
-    add.style.display = 'none';
+    addPlayer.style.display = 'none';
 })
 
 btnPassar.addEventListener('click', () => proxRodada(iniciativa));
@@ -64,5 +73,4 @@ btnFinalizar.addEventListener('click', () => {
     comb.style.display = 'none';
     cont = 0;
     contRodada = 0;
-    add.style.display = 'inline';
 })
