@@ -29,3 +29,15 @@ body.blur-active #combate {
     text-align: center;
     box-shadow: 0 0 20px rgba(0, 0, 0, 3);
 }
+
+.player-card {
+    padding: 10px;
+    margin: 5px;
+    background: #eee;
+    border-radius: 8px;
+}
+
+.player-card.ativo {
+    background: #ffd966;
+    border: 2px solid  #ff9900;
+}

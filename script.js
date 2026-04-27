@@ -1,55 +1,139 @@
 // Declaracão de Variáveis
-let iniciativa = [];
-let contRodada = 0;
-let cont = 0;
+let jogo = {
+    players: [],
+    rodada: 1,
+    turno: 0,
+    emCombate: false
+}
+
+// Classes
+class player 
+{
+    constructor(nome, vida, iniciativa)
+    {
+        this.nome = nome;
+        this.vida = Number(vida);
+        this.iniciativa = Number(iniciativa);
+    }
+}
 
 // Abstração do HTML
-let player = document.getElementById('players');
+let players = document.getElementById('players');
 let salvar = document.getElementById('salvar');
 let cancelar = document.getElementById('cancelar');
 let comb = document.getElementById('combate');
 let addPlayer = document.getElementById('criando-player');
 let btnCriar = document.getElementById('btn-criar');
-let btnCombate = document.getElementById('btn-combate');
-let btnPassar = document.getElementById('btn-passar');
 let btnFinalizar = document.getElementById('btn-finalizar')
 
 // Funções
-function proxRodada (array)
+function renderPlayer()
 {
-    let rodada = document.getElementById('rodada');
-    let rodadaPlayer = document.getElementById('rodada-player');
-    contRodada++;
-    rodada.innerHTML = `Rodada ${contRodada}`;
+    let container = document.getElementById('players');
+    container.innerHTML = '';
 
-    if (cont == array.length)
+    jogo.players.forEach((player, index) => {
+        let div = document.createElement('div');
+
+        div.classList.add('player-card');
+
+        if(jogo.emCombate && index === jogo.turno)
+        {
+            div.classList.add('ativo')
+        }
+        else
+        {
+            div.classList.remove('ativo')
+        }
+
+        div.innerHTML = `
+            <strong>${player.nome}</strong>
+            <p>Vida: ${player.vida}/${player.vida}</p>
+            <p>${player.iniciativa}</p>`;
+
+        container.appendChild(div);
+    })
+}
+
+function abrirModal()
+{
+    document.getElementById('criando-player').style.display = 'block';
+    document.body.classList.add('blur-active');
+}
+
+function fecharModal()
+{
+    document.getElementById('criando-player').style.display = 'none';
+    document.body.classList.remove('blur-active');
+}
+
+function renderRodada()
+{
+    let rodadaEl = document.getElementById('rodada');
+    rodadaEl.textContent = `Rodada ${jogo.rodada}`;
+}
+
+function proxRodada()
+{
+    jogo.turno++;
+
+    if(jogo.turno >= jogo.players.length)
     {
-        cont = 1;
+        jogo.turno = 0;
+        jogo.rodada++;
     }
-    else
+
+    renderRodada();
+    renderPlayer();
+}
+
+function iniciarCombate() {
+    if (jogo.players.length === 0)
     {
-        cont++;
+        return alert("Não há combatentes definidos!");
     }
-    rodadaPlayer.innerHTML = `Vez de ${array[cont - 1]}`;
+    jogo.players.sort((a,b) => b.iniciativa - a.iniciativa);
+
+    jogo.rodada = 1;
+    jogo.turno = 0;
+    jogo.emCombate = true;
+
+    comb.style.display = 'inline';
+
+    renderRodada();
+    renderPlayer();
+}
+
+function finalizarCombate() {
+    comb.style.display = 'none';
+    jogo.emCombate = false;
+
+    renderPlayer();
 }
 
 // Eventos de botões
-btnCriar.addEventListener('click', () => {
+document.getElementById('btn-criar').addEventListener('click', () => {
     addPlayer.style.display = 'block';
     document.body.classList.add('blur-active');
 })
 
-salvar.addEventListener('click', () => {
-    let item = document.createElement('p');
+document.getElementById('salvar').addEventListener('click', () => {
     let nome = document.getElementById('nome').value;
     let vida = document.getElementById('vida').value;
-    item.textContent = `Nome: ${nome}\n\n Vida: ${vida}\n\n`;
-    player.appendChild(item);
-    iniciativa.push(nome);
+
+    if (nome === '' || vida === '' || iniciativa === '')
+    {
+        alert('Preencha tudo!');
+        return;
+    }
+
+    let novoPlayer = new player(nome, vida, iniciativa);
     document.getElementById('nome').value = '';
     document.getElementById('vida').value = '';
-    addPlayer.style.display = 'none';
-    document.body.classList.remove('blur-active');
+    document.getElementById('iniciativa').value = '';
+    jogo.players.push(novoPlayer);
+    renderPlayer();
+    fecharModal();
 })
 
 cancelar.addEventListener('click', () => {
@@ -57,20 +141,8 @@ cancelar.addEventListener('click', () => {
     document.body.classList.remove('blur-active');
 })
 
-btnCombate.addEventListener('click', () => {
-    if (iniciativa.length == 0)
-    {
-        return alert("Não há combatentes definidos!");
-    }
-    comb.style.display = 'inline';
-    proxRodada(iniciativa)
-    addPlayer.style.display = 'none';
-})
+document.getElementById('btn-combate').addEventListener('click', iniciarCombate)
 
-btnPassar.addEventListener('click', () => proxRodada(iniciativa));
+document.getElementById('btn-passar').addEventListener('click', proxRodada);
 
-btnFinalizar.addEventListener('click', () => {
-    comb.style.display = 'none';
-    cont = 0;
-    contRodada = 0;
-})
+document.getElementById('btn-finalizar').addEventListener('click', finalizarCombate);
