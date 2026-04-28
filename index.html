@@ -13,25 +13,62 @@
         </div>
     </main>
 
-    <button id="btn-criar">Adicionar Personagem</button>
+    <div id="botoes">
+        <button id="btn-criar">Adicionar Personagem</button>
 
-    <div id="criando-player">
-        <h2>Adicionando Personagem</h2>
-        <p><input type="text" id="nome" placeholder="nome"></p>
-        <p><input type="number" id="vida" placeholder="vida"></p>
-        <p><input type="number" id="iniciativa" placeholder="iniciativa"></p>
+        <div id="criando-player">
+            <h2>Adicionando Personagem</h2>
+            <p><input type="text" id="nome" placeholder="nome"></p>
+            <p><input type="number" id="vida" placeholder="vida"></p>
+            <p><input type="number" id="iniciativa" placeholder="iniciativa"></p>
 
-        <button id="salvar">Salvar</button>
-        <button id="cancelar">Cancelar</button>
+            <button id="salvar">Salvar</button>
+            <button id="cancelar">Cancelar</button>
+        </div>
+        <button id="btn-limpar-mortos">Remover Mortos</button>
+        <button id="btn-combate">Iniciar Combate</button>
     </div>
-
-    <button id="btn-combate">Iniciar Combate</button>
 
     <div id="combate"> 
         <h2 id="rodada">Rodada 0</h2>
         <div id="rodada-player"></div>
         <button id="btn-passar">Passar Rodada</button>
+        <button id="btn-atacar">Atacar</button>
+        <button id="btn-remover-status">Remover Status</button>
         <button id="btn-finalizar">Finalizar Combate</button>
+    </div>
+
+    <div id="log-combate"></div>
+
+    <div id="modal-ataque" class="modal">
+        <h2>Ataque</h2>
+
+        <p>
+            <select id="alvo">
+                <option value="">Selecione o alvo</option>
+            </select>
+        </p>
+
+        <p>
+            <input type="number" id="dano" placeholder="Dano">
+        </p>
+
+        <p>
+            <input type="text" id="status" placeholder="Ex: envenenado">
+        </p>
+
+        <button id="confirmar-ataque">Confirmar</button>
+        <button id="cancelar-ataque">Cancelar</button>
+    </div>
+
+    <div id="modal-status" class="modal">
+        <h2>Remover Status</h2>
+
+        <select id="player-status"></select>
+        <select id="lista-status"></select>
+
+        <button id="confirmar-remocao">Remover</button>
+        <button id="cancelar-remocao">Cancelar</button>
     </div>
 
     <script src="script.js"></script>

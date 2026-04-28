@@ -5,7 +5,9 @@ body {
 body.blur-active main,
 body.blur-active #players,
 body.blur-active #btn-criar,
+body.blur-active #btn-limpar-mortos,
 body.blur-active #btn-combate,
+body.blur-active #log-combate,
 body.blur-active #combate {
     filter: blur(5px);
     pointer-events: none;
@@ -35,9 +37,31 @@ body.blur-active #combate {
     margin: 5px;
     background: #eee;
     border-radius: 8px;
+    transition: 0.2s;
 }
 
 .player-card.ativo {
     background: #ffd966;
     border: 2px solid  #ff9900;
+}
+
+.player-card.morto {
+    background: #531717;
+    color: white;
+    opacity: 0.7;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 3);
 }
