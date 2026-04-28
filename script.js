@@ -10,12 +10,13 @@ let jogo = {
 // Classes
 class Player 
 {
-    constructor(nome, vida, iniciativa)
+    constructor(nome, vida, iniciativa, aliado)
     {
         this.nome = nome;
         this.vida = Number(vida);
         this.vidaAtual = this.vida;
         this.iniciativa = Number(iniciativa);
+        this.aliado = aliado;
         this.vivo = true;
         this.status = [];
     }
@@ -33,8 +34,10 @@ let btnFinalizar = document.getElementById('btn-finalizar')
 // Funções
 function renderPlayer()
 {
-    let container = document.getElementById('players');
-    container.innerHTML = '';
+    let containerAliado = document.getElementById('Aliados');
+    let containerInimigo = document.getElementById('Inimigos');
+    containerAliado.innerHTML = '';
+    containerInimigo.innerHTML = '';
 
     jogo.players.forEach((player, index) => {
         let div = document.createElement('div');
@@ -58,9 +61,14 @@ function renderPlayer()
             <strong>${player.nome}</strong>
             <p>Vida: ${player.vidaAtual}/${player.vida}</p>
             <p>${player.iniciativa}</p>
+            <p>${player.aliado}</p>
             <p>Status: ${player.status.join(', ')}</p>`;
 
-        container.appendChild(div);
+        if (!player.aliado) {
+            containerInimigo.appendChild(div);
+        } else {
+            containerAliado.appendChild(div);
+        }
     });
 
 }
@@ -80,7 +88,9 @@ function fecharModal()
 function renderRodada()
 {
     let rodadaEl = document.getElementById('rodada');
+    let rodadaP = document.getElementById('rodada-player');
     rodadaEl.textContent = `Rodada ${jogo.rodada}`;
+    rodadaP.innerHTML = `${jogo.ordemTurno[jogo.turno].player.nome}`;
 
     if (!jogo.emCombate)
     {
@@ -323,6 +333,15 @@ document.getElementById('salvar').addEventListener('click', () => {
     let nome = document.getElementById('nome').value;
     let vida = document.getElementById('vida').value;
     let iniciativa = document.getElementById('iniciativa').value;
+    let aliado = document.getElementById('lado').value;
+    let lado = true;
+
+    if (aliado === '1')
+    {
+        lado = true;
+    } else {
+        lado = false;
+    }
 
     if (nome === '' || vida === '' || iniciativa === '')
     {
@@ -330,10 +349,11 @@ document.getElementById('salvar').addEventListener('click', () => {
         return;
     }
 
-    let novoPlayer = new Player(nome, vida, iniciativa);
+    let novoPlayer = new Player(nome, vida, iniciativa, lado);
     document.getElementById('nome').value = '';
     document.getElementById('vida').value = '';
     document.getElementById('iniciativa').value = '';
+    document.getElementById('lado').value = '1';
     jogo.players.push(novoPlayer);
     renderPlayer();
     fecharModal();

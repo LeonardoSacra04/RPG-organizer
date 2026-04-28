@@ -7,69 +7,139 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <main>
-        <h2>Players</h2>
-        <div id="players">
-        </div>
+        <header>
+            <h1>RPG Organizer</h1>
+        </header>
+
+        <!-- LISTA DE PLAYERS -->
+        <section id="players">
+            <h2>Players</h2>
+
+            <section>
+                <h3>Aliados</h3>
+                <div id="Aliados"></div>
+            </section>
+
+            <section>
+                <h3>Inimigos</h3>
+                <div id="Inimigos"></div>
+            </section>
+        </section>
+
+        <!-- CONTROLES -->
+        <section id="botoes">
+            <h2>Ações</h2>
+
+            <button id="btn-criar">Adicionar Personagem</button>
+            <button id="btn-limpar-mortos">Remover Mortos</button>
+            <button id="btn-combate">Iniciar Combate</button>
+        </section>
+
+        <!-- COMBATE -->
+        <section id="combate"> 
+            <header>
+                <h2 id="rodada">Rodada 0</h2>
+                <p>Vez de <strong id="rodada-player"></strong></p>
+            </header>
+
+            <div class="acoes-combate">
+                <button id="btn-passar">Passar Rodada</button>
+                <button id="btn-atacar">Atacar</button>
+                <button id="btn-remover-status">Remover Status</button>
+                <button id="btn-finalizar">Finalizar Combate</button>
+            </div>
+
+            <section id="log-combate">
+                <h3>Log do Combate</h3>
+            </section>
+        </section>
     </main>
 
-    <div id="botoes">
-        <button id="btn-criar">Adicionar Personagem</button>
+    <!-- MODAL CRIAR PLAYER -->
+    <dialog id="criando-player">
+        <form method="dialog">
+            <h2>Adicionar Personagem</h2>
 
-        <div id="criando-player">
-            <h2>Adicionando Personagem</h2>
-            <p><input type="text" id="nome" placeholder="nome"></p>
-            <p><input type="number" id="vida" placeholder="vida"></p>
-            <p><input type="number" id="iniciativa" placeholder="iniciativa"></p>
+            <label>
+                Nome:
+                <input type="text" id="nome" required>
+            </label>
 
-            <button id="salvar">Salvar</button>
-            <button id="cancelar">Cancelar</button>
-        </div>
-        <button id="btn-limpar-mortos">Remover Mortos</button>
-        <button id="btn-combate">Iniciar Combate</button>
-    </div>
+            <label>
+                Vida:
+                <input type="number" id="vida" required>
+            </label>
 
-    <div id="combate"> 
-        <h2 id="rodada">Rodada 0</h2>
-        <div id="rodada-player"></div>
-        <button id="btn-passar">Passar Rodada</button>
-        <button id="btn-atacar">Atacar</button>
-        <button id="btn-remover-status">Remover Status</button>
-        <button id="btn-finalizar">Finalizar Combate</button>
-    </div>
+            <label>
+                Iniciativa:
+                <input type="number" id="iniciativa" required>
+            </label>
 
-    <div id="log-combate"></div>
+            <label>
+                Lado:
+                <select id="lado">
+                    <option value="1">Aliado</option>
+                    <option value="2">Inimigo</option>
+                </select>
+            </label>
 
-    <div id="modal-ataque" class="modal">
-        <h2>Ataque</h2>
+            <menu>
+                <button id="salvar">Salvar</button>
+                <button id="cancelar" type="button">Cancelar</button>
+            </menu>
+        </form>
+    </dialog>
 
-        <p>
-            <select id="alvo">
-                <option value="">Selecione o alvo</option>
-            </select>
-        </p>
+    <!-- MODAL ATAQUE -->
+    <dialog id="modal-ataque">
+        <form method="dialog">
+            <h2>Ataque</h2>
 
-        <p>
-            <input type="number" id="dano" placeholder="Dano">
-        </p>
+            <label>
+                Alvo:
+                <select id="alvo"></select>
+            </label>
 
-        <p>
-            <input type="text" id="status" placeholder="Ex: envenenado">
-        </p>
+            <label>
+                Dano:
+                <input type="number" id="dano">
+            </label>
 
-        <button id="confirmar-ataque">Confirmar</button>
-        <button id="cancelar-ataque">Cancelar</button>
-    </div>
+            <label>
+                Status:
+                <input type="text" id="status" placeholder="Ex: envenenado">
+            </label>
 
-    <div id="modal-status" class="modal">
-        <h2>Remover Status</h2>
+            <menu>
+                <button id="confirmar-ataque">Confirmar</button>
+                <button id="cancelar-ataque" type="button">Cancelar</button>
+            </menu>
+        </form>
+    </dialog>
 
-        <select id="player-status"></select>
-        <select id="lista-status"></select>
+    <!-- MODAL STATUS -->
+    <dialog id="modal-status">
+        <form method="dialog">
+            <h2>Remover Status</h2>
 
-        <button id="confirmar-remocao">Remover</button>
-        <button id="cancelar-remocao">Cancelar</button>
-    </div>
+            <label>
+                Player:
+                <select id="player-status"></select>
+            </label>
+
+            <label>
+                Status:
+                <select id="lista-status"></select>
+            </label>
+
+            <menu>
+                <button id="confirmar-remocao">Remover</button>
+                <button id="cancelar-remocao" type="button">Cancelar</button>
+            </menu>
+        </form>
+    </dialog>
 
     <script src="script.js"></script>
 </body>
