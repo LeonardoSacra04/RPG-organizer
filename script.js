@@ -1,17 +1,38 @@
-// Declaracão de Variáveis
-let jogo = {
+const jogo = {
     players: [],
-    rodada: 1,
+    ordemTurno: [],
     turno: 0,
-    emCombate: false,
-    ordemTurno: []
+    rodada: 1,
+    emCombate: false
+};
+
+const STORAGE_KEY = 'rpg-organizer';
+
+// salvar
+function salvarJogo() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(jogo.players));
 }
 
-// Classes
-class Player 
-{
-    constructor(nome, vida, iniciativa, aliado)
-    {
+// carregar
+function carregarJogo() {
+    const dados = localStorage.getItem(STORAGE_KEY);
+
+    if (!dados) return;
+
+    const playersSalvos = JSON.parse(dados);
+
+    // recria como instâncias da classe Player
+    jogo.players = playersSalvos.map(p => {
+        const player = new Player(p.nome, p.vida, p.iniciativa, p.aliado);
+        player.vidaAtual = p.vidaAtual;
+        player.vivo = p.vivo;
+        player.status = p.status || [];
+        return player;
+    });
+}
+
+class Player {
+    constructor(nome, vida, iniciativa, aliado) {
         this.nome = nome;
         this.vida = Number(vida);
         this.vidaAtual = this.vida;
@@ -20,368 +41,353 @@ class Player
         this.vivo = true;
         this.status = [];
     }
+
+    sofrerDano(dano) {
+        this.vidaAtual -= dano;
+        if (this.vidaAtual <= 0) {
+            this.vidaAtual = 0;
+            this.vivo = false;
+        }
+    }
 }
 
-// Abstração do HTML
-let players = document.getElementById('players');
-let salvar = document.getElementById('salvar');
-let cancelar = document.getElementById('cancelar');
-let comb = document.getElementById('combate');
-let addPlayer = document.getElementById('criando-player');
-let btnCriar = document.getElementById('btn-criar');
-let btnFinalizar = document.getElementById('btn-finalizar')
+// ================= UTIL =================
 
-// Funções
-function renderPlayer()
-{
-    let containerAliado = document.getElementById('Aliados');
-    let containerInimigo = document.getElementById('Inimigos');
-    containerAliado.innerHTML = '';
-    containerInimigo.innerHTML = '';
-
-    jogo.players.forEach((player, index) => {
-        let div = document.createElement('div');
-
-        div.classList.add('player-card');
-
-        if(jogo.emCombate &&
-           jogo.ordemTurno &&
-           jogo.ordemTurno[jogo.turno] &&  
-           jogo.ordemTurno[jogo.turno].player === player)
-        {
-            div.classList.add('ativo');
-        }
-
-        if(!player.vivo)
-        {
-            div.classList.add('morto');
-        }
-
-        div.innerHTML = `
-            <strong>${player.nome}</strong>
-            <p>Vida: ${player.vidaAtual}/${player.vida}</p>
-            <p>${player.iniciativa}</p>
-            <p>${player.aliado}</p>
-            <p>Status: ${player.status.join(', ')}</p>`;
-
-        if (!player.aliado) {
-            containerInimigo.appendChild(div);
-        } else {
-            containerAliado.appendChild(div);
-        }
-    });
-
-}
-
-function abrirModal()
-{
-    document.getElementById('criando-player').style.display = 'block';
+function abrirModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = 'block';
     document.body.classList.add('blur-active');
+
+    if (modal.tagName === 'FORM') {
+        modal.reset();
+    }
 }
 
-function fecharModal()
-{
-    document.getElementById('criando-player').style.display = 'none';
+function fecharModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = 'none';
     document.body.classList.remove('blur-active');
+
+    if (modal.tagName === 'FORM') {
+        modal.reset();
+    }
 }
 
-function renderRodada()
-{
-    let rodadaEl = document.getElementById('rodada');
-    let rodadaP = document.getElementById('rodada-player');
-    rodadaEl.textContent = `Rodada ${jogo.rodada}`;
-    rodadaP.innerHTML = `${jogo.ordemTurno[jogo.turno].player.nome}`;
+function adicionarLog(texto, tipo = 'sistema') {
+    const log = document.getElementById('log-combate');
 
-    if (!jogo.emCombate)
-    {
+    const p = document.createElement('p');
+    p.textContent = texto;
+    p.classList.add(`log-${tipo}`);
+
+    log.appendChild(p);
+    log.scrollTop = log.scrollHeight;
+}
+
+// ================= RENDER =================
+
+function renderPlayers() {
+    const aliados = document.getElementById('Aliados');
+    const inimigos = document.getElementById('Inimigos');
+
+    aliados.innerHTML = '';
+    inimigos.innerHTML = '';
+
+    jogo.players.forEach(player => {
+        const card = document.createElement('article');
+        card.classList.add('player-card');
+
+        if (!player.vivo) card.classList.add('morto');
+
+        if (jogo.emCombate &&
+            jogo.ordemTurno[jogo.turno]?.player === player) {
+            card.classList.add('ativo');
+        }
+
+        // 🔥 AQUI
+        const porcentagem = (player.vidaAtual / player.vida) * 100;
+
+        let cor = '#4caf50';
+        if (porcentagem <= 50) cor = '#ff9800';
+        if (porcentagem <= 25) cor = '#f44336';
+
+        // 👇 usa aqui
+        card.innerHTML = `
+            <div class="iniciativa">${player.iniciativa}</div>
+
+            <strong>${player.nome}</strong>
+
+            <div>
+                <div class="barra-vida">
+                    <span style="width: ${porcentagem}%; background: ${cor}"></span>
+                </div>
+                <small>${player.vidaAtual}/${player.vida} HP</small>
+            </div>
+
+            <small>${player.status.join(', ') || 'Sem status'}</small>
+        `;
+
+        player.aliado
+            ? aliados.appendChild(card)
+            : inimigos.appendChild(card);
+    });
+}
+
+function renderRodada() {
+    const rodadaEl = document.getElementById('rodada');
+
+    if (!jogo.emCombate) {
         rodadaEl.textContent = 'Rodada 0';
+        document.getElementById('rodada-player').textContent = '';
         return;
     }
 
     rodadaEl.textContent = `Rodada ${jogo.rodada}`;
+    document.getElementById('rodada-player').textContent =
+        jogo.ordemTurno[jogo.turno].player.nome;
 }
 
-function proxRodada()
-{
-    if(!jogo.emCombate || jogo.players.length === 0)
-    {
+// ================= COMBATE =================
+
+function iniciarCombate() {
+    if (jogo.players.length === 0) {
+        alert("Adicione players primeiro!");
         return;
     }
+
+    jogo.ordemTurno = jogo.players
+        .map(p => ({ player: p }))
+        .sort((a, b) => b.player.iniciativa - a.player.iniciativa);
+
+    jogo.turno = 0;
+    jogo.rodada = 1;
+    jogo.emCombate = true;
+
+    document.body.classList.add('modo-combate');
+    document.getElementById('botoes').style.display = 'none';
+
+    renderRodada();
+    renderPlayers();
+}
+
+function finalizarCombate() {
+    jogo.emCombate = false;
+    jogo.ordemTurno = [];
+    jogo.turno = 0;
+    jogo.rodada = 1;
+
+    document.body.classList.remove('modo-combate');
+    document.getElementById('botoes').style.display = 'block';
+
+    adicionarLog("Combate finalizado");
+
+    renderPlayers();
+    renderRodada();
+}
+
+function proximoTurno() {
+    if (!jogo.emCombate) return;
 
     do {
         jogo.turno++;
-        if(jogo.turno >= jogo.ordemTurno.length) {
+        if (jogo.turno >= jogo.ordemTurno.length) {
             jogo.turno = 0;
             jogo.rodada++;
         }
     } while (!jogo.ordemTurno[jogo.turno].player.vivo);
 
     renderRodada();
-    renderPlayer();
+    renderPlayers();
 }
 
-function iniciarCombate() {
-    if (jogo.players.length === 0)
-    {
-        return alert("Não há combatentes definidos!");
-    }
-    jogo.ordemTurno = jogo.players
-        .map((player, index) =>  ({ player, index }))
-        .sort((a, b) => b.player.iniciativa - a.player.iniciativa);
-
-    jogo.rodada = 1;
-    jogo.turno = 0;
-    jogo.emCombate = true;
-
-    comb.style.display = 'inline';
-    document.getElementById('botoes').style.display = 'none';
-    renderRodada();
-    renderPlayer();
-}
-
-function finalizarCombate() {
-    comb.style.display = 'none';
-    jogo.emCombate = false;
-
-    document.getElementById('botoes').style.display = 'inline';
-    document.getElementById('log-combate').innerHTML = '';
-    renderPlayer();
-
-}
-
-function verificarMorte(index) {
-    let alvo = jogo.ordemTurno[index].player;
-
-    if(alvo.vidaAtual <= 0)
-    {
-        adicionarLog(`${alvo.nome} morreu!`);
-        alvo.vivo = false;
-
-        alvo.vidaAtual = 0;
-        alvo.vivo = false;
-    }
-}
+// ================= ATAQUE =================
 
 function abrirModalAtaque() {
-    if (!jogo.emCombate) return;
+    const select = document.getElementById('alvo');
+    select.innerHTML = '';
 
-    let select = document.getElementById('alvo');
-    select.innerHTML = '<option value="">Selecione o alvo</option>';
+    const atacante = jogo.ordemTurno[jogo.turno].player;
 
-    let atacante = jogo.ordemTurno[jogo.turno].player;
-
-    jogo.players.forEach((player, index) => {
-        if (player.vivo && player !== atacante) {
-            let option = document.createElement('option');
-            option.value = index;
-            option.textContent = player.nome;
-            select.appendChild(option);
+    jogo.players.forEach((p, i) => {
+        if (p.vivo && p !== atacante) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = p.nome;
+            select.appendChild(opt);
         }
     });
 
-    document.getElementById('modal-ataque').style.display = 'block';
-    document.body.classList.add('blur-active');
-}
-
-function fecharModalAtaque() {
-    document.getElementById('modal-ataque').style.display = 'none';
-    document.body.classList.remove('blur-active');
-
-    document.getElementById('dano').value = '';
-    document.getElementById('status').value = '';
+    abrirModal('modal-ataque');
 }
 
 function confirmarAtaque() {
-    let alvoIndex = document.getElementById('alvo').value;
-    let dano = document.getElementById('dano').value;
-    let status = document.getElementById('status').value;
+    const alvoIndex = Number(document.getElementById('alvo').value);
+    const dano = Number(document.getElementById('dano').value);
+    const status = document.getElementById('status').value.trim();
 
-    if (alvoIndex === '' || dano === '') {
-        alert("Preencha os campos!");
+    if (isNaN(alvoIndex) || isNaN(dano)) {
+        alert("Preencha corretamente!");
         return;
     }
 
-    let atacante = jogo.ordemTurno[jogo.turno].player;
-    let alvo = jogo.players[alvoIndex];
+    const atacante = jogo.ordemTurno[jogo.turno].player;
+    const alvo = jogo.players[alvoIndex];
 
-    dano = Number(dano);
+    if (!alvo) return;
 
-    alvo.vidaAtual -= dano;
+    alvo.sofrerDano(dano);
+    salvarJogo();
 
-    if (alvo.vidaAtual < 0) {
-        alvo.vidaAtual = 0;
+    adicionarLog(`${atacante.nome} causou ${dano} em ${alvo.nome}`, 'ataque');
+
+    if (!alvo.vivo) {
+        adicionarLog(`${alvo.nome} morreu!`, 'morte');
     }
 
-    if (alvo.vidaAtual === 0) {
-        alvo.vivo = false;
-    }
-
-    adicionarLog(`${atacante.nome} causou ${dano} de dano em ${alvo.nome}`);
-
-    if (status !== '') {
+    if (status) {
         alvo.status.push(status);
-        adicionarLog(`${alvo.nome} está ${status}`);
+        salvarJogo();
+        adicionarLog(`${alvo.nome} está ${status}`, 'status');
     }
 
-    fecharModalAtaque();
-    renderPlayer();
+    fecharModal('modal-ataque');
+    renderPlayers();
 }
 
-function adicionarLog(texto) {
-    let log = document.getElementById('log-combate');
-    
-    let p = document.createElement('p');
-    p.textContent = texto;
-
-    log.prepend(p); // mais recente no topo
-}
-
-function removerMortos() {
-    if (jogo.emCombate) {
-        alert("Não pode remover durante o combate!");
-        return;
-    }
-
-    jogo.players = jogo.players.filter(player => player.vivo);
-
-    renderPlayer();
-    adicionarLog("Players mortos foram removidos.");
-}
+// ================= STATUS =================
 
 function abrirModalStatus() {
-    let selectPlayer = document.getElementById('player-status');
-    selectPlayer.innerHTML = '';
+    const select = document.getElementById('player-status');
+    select.innerHTML = '';
 
-    jogo.players.forEach((player, index) => {
-        if (player.status.length > 0) {
-            let option = document.createElement('option');
-            option.value = index;
-            option.textContent = player.nome;
-            selectPlayer.appendChild(option);
+    jogo.players.forEach((p, i) => {
+        if (p.status.length > 0) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = p.nome;
+            select.appendChild(opt);
         }
     });
 
-    // 🔥 CORREÇÃO IMPORTANTE
-    if (selectPlayer.options.length > 0) {
-        selectPlayer.value = selectPlayer.options[0].value;
-        atualizarListaStatus();
-    } else {
-        alert("Nenhum player possui status!");
+    if (select.options.length === 0) {
+        alert("Nenhum status disponível");
         return;
     }
 
-    document.getElementById('modal-status').style.display = 'block';
-    document.body.classList.add('blur-active');
+    atualizarListaStatus();
+    abrirModal('modal-status');
 }
 
 function atualizarListaStatus() {
-    let playerIndex = document.getElementById('player-status').value;
-    let lista = document.getElementById('lista-status');
+    const playerIndex = document.getElementById('player-status').value;
+    const lista = document.getElementById('lista-status');
 
     lista.innerHTML = '';
 
-    if (playerIndex === '') return;
+    const player = jogo.players[playerIndex];
+    if (!player) return;
 
-    let player = jogo.players[playerIndex];
-
-    player.status.forEach((status, index) => {
-        let option = document.createElement('option');
-        option.value = index;
-        option.textContent = status;
-        lista.appendChild(option);
+    player.status.forEach((s, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = s;
+        lista.appendChild(opt);
     });
 }
 
 function removerStatus() {
-    let playerIndex = document.getElementById('player-status').value;
-    let statusIndex = document.getElementById('lista-status').value;
+    const playerIndex = document.getElementById('player-status').value;
+    const statusIndex = document.getElementById('lista-status').value;
 
-    if (playerIndex === '' || statusIndex === '') {
-        alert("Selecione corretamente!");
-        return;
-    }
+    const player = jogo.players[playerIndex];
+    if (!player) return;
 
-    let player = jogo.players[playerIndex];
-    let removido = player.status[statusIndex];
-
-    player.status.splice(statusIndex, 1);
+    const removido = player.status.splice(statusIndex, 1)[0];
+    salvarJogo();
 
     adicionarLog(`${removido} removido de ${player.nome}`);
 
-    fecharModalStatus();
-    renderPlayer();
+    fecharModal('modal-status');
+    renderPlayers();
 }
 
-function fecharModalStatus() {
-    document.getElementById('modal-status').style.display = 'none';
-    document.body.classList.remove('blur-active');
+// ================= OUTROS =================
+
+function removerMortos() {
+    jogo.players = jogo.players.filter(p => p.vivo);
+    salvarJogo();
+    adicionarLog("Mortos removidos");
+    renderPlayers();
 }
 
-// Eventos de botões
-document.getElementById('btn-criar').addEventListener('click', () => {
-    addPlayer.style.display = 'block';
-    document.body.classList.add('blur-active');
-})
+// ================= VALIDAÇÃO =================
 
-document.getElementById('salvar').addEventListener('click', () => {
-    if(jogo.emCombate)
-    {
-        alert('Combate já iniciado!');
-        return;
-    }
-    
-    let nome = document.getElementById('nome').value;
-    let vida = document.getElementById('vida').value;
-    let iniciativa = document.getElementById('iniciativa').value;
-    let aliado = document.getElementById('lado').value;
-    let lado = true;
+function validarFormularioPlayer() {
+    const nome = document.getElementById('nome').value.trim();
+    const vida = Number(document.getElementById('vida').value);
+    const iniciativa = document.getElementById('iniciativa').value;
 
-    if (aliado === '1')
-    {
-        lado = true;
-    } else {
-        lado = false;
-    }
+    const valido = nome.length > 0 && vida > 0 && iniciativa !== '';
 
-    if (nome === '' || vida === '' || iniciativa === '')
-    {
-        alert('Preencha tudo!');
-        return;
-    }
+    document.getElementById('salvar').disabled = !valido;
+}
 
-    let novoPlayer = new Player(nome, vida, iniciativa, lado);
-    document.getElementById('nome').value = '';
-    document.getElementById('vida').value = '';
-    document.getElementById('iniciativa').value = '';
-    document.getElementById('lado').value = '1';
-    jogo.players.push(novoPlayer);
-    renderPlayer();
-    fecharModal();
-})
+// ================= EVENTOS =================
 
-cancelar.addEventListener('click', () => {
-    addPlayer.style.display = 'none';
-    document.body.classList.remove('blur-active');
-})
+document.getElementById('btn-criar').onclick = () => abrirModal('criando-player');
 
-document.getElementById('btn-combate').addEventListener('click', iniciarCombate)
+['nome', 'vida', 'iniciativa'].forEach(id => {
+    document.getElementById(id).addEventListener('input', validarFormularioPlayer);
+});
 
-document.getElementById('btn-passar').addEventListener('click', proxRodada);
+document.getElementById('criando-player').addEventListener('submit', e => {
+    e.preventDefault();
 
-document.getElementById('btn-atacar').addEventListener('click', abrirModalAtaque);
+    const form = e.target;
 
-document.getElementById('btn-finalizar').addEventListener('click', finalizarCombate);
+    const nome = document.getElementById('nome').value.trim();
+    const vida = Number(document.getElementById('vida').value);
+    const iniciativa = document.getElementById('iniciativa').value;
+    const lado = document.getElementById('lado').value === '1';
 
-document.getElementById('confirmar-ataque').addEventListener('click', confirmarAtaque);
+    if (!nome || vida <= 0 || !iniciativa) return;
 
-document.getElementById('cancelar-ataque').addEventListener('click', fecharModalAtaque);
+    const novo = new Player(nome, vida, iniciativa, lado);
+    jogo.players.push(novo);
+    salvarJogo();
 
-document.getElementById('btn-limpar-mortos').addEventListener('click', removerMortos);
+    renderPlayers();
 
-document.getElementById('player-status').addEventListener('change', atualizarListaStatus);
+    form.reset(); // limpa inputs
 
-document.getElementById('btn-remover-status').addEventListener('click', abrirModalStatus);
+    // 🔥 força botão voltar ao estado inicial
+    document.getElementById('salvar').disabled = true;
 
-document.getElementById('confirmar-remocao').addEventListener('click', removerStatus);
+    fecharModal('criando-player');
+});
 
-document.getElementById('cancelar-remocao').addEventListener('click', fecharModalStatus);
+document.getElementById('modal-ataque').addEventListener('submit', e => {
+    e.preventDefault();
+    confirmarAtaque();
+});
+
+document.getElementById('modal-status').addEventListener('submit', e => {
+    e.preventDefault();
+    removerStatus();
+});
+
+document.getElementById('cancelar').onclick = () => fecharModal('criando-player');
+document.getElementById('cancelar-ataque').onclick = () => fecharModal('modal-ataque');
+document.getElementById('cancelar-remocao').onclick = () => fecharModal('modal-status');
+
+document.getElementById('btn-combate').onclick = iniciarCombate;
+document.getElementById('btn-passar').onclick = proximoTurno;
+document.getElementById('btn-finalizar').onclick = finalizarCombate;
+document.getElementById('btn-atacar').onclick = abrirModalAtaque;
+document.getElementById('btn-remover-status').onclick = abrirModalStatus;
+document.getElementById('player-status').onchange = atualizarListaStatus;
+document.getElementById('btn-limpar-mortos').onclick = removerMortos;
+
+carregarJogo();
+renderPlayers();
+validarFormularioPlayer();
