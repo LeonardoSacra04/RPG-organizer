@@ -328,7 +328,11 @@ function abrirNotas() {
 }
 
 function fecharNotas() {
-    document.getElementById('notas').classList.remove('aberto');
+    const notas = document.getElementById('notas');
+
+    notas.classList.remove('aberto');
+    notas.style.transform = ''; // 🔥 limpa qualquer inline antigo
+
     document.getElementById('overlay').classList.remove('ativo');
 }
 
