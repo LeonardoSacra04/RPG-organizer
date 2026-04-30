@@ -350,13 +350,6 @@ input, select {
     font-size: 0.95rem;
 }
 
-@media (hover: hover) {
-    /* leve puxada quando passa o mouse */
-    #notas:not(.aberto):hover {
-        transform: translateX(-95%);
-    }
-}
-
 @media (max-width: 768px) {
 
     #combate {
