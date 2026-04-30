@@ -360,7 +360,7 @@ input, select {
     #combate {
         font-size: 0.9rem;
     }
-    
+
     /* layout volta a ser coluna */
     .modo-combate #layout {
         flex-direction: column;
@@ -382,10 +382,37 @@ input, select {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     }
 
-    /* sobe a seta no mobile */
+    /* notas vêm da direita no mobile */
+    #notas {
+        left: auto;
+        right: 0;
+
+        border-right: none;
+        border-left: 1px solid #444;
+
+        transform: translateX(100%);
+    }
+
+    /* aberto */
+    #notas.aberto {
+        transform: translateX(0);
+    }
+
+    /* botão seta vai para o outro lado */
     #toggle-notas {
-        top: 500px;
+        top: 20px;
         height: 80px;
         width: 48px;
+
+        right: auto;
+        left: -42px;
+
+        border-radius: 50px 0 0 50px;
+        border-left: 1px solid #444;
+        border-right: none;
+    }
+
+    #notas.aberto .icone-seta {
+        transform: rotate(0deg);
     }
 }

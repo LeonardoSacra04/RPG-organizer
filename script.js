@@ -433,44 +433,50 @@ let dragging = false;
 
 const notas = document.getElementById('notas');
 
-// começa o toque
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
 document.addEventListener('touchstart', (e) => {
-    if (window.innerWidth > 768) return;
-    
+    if (!isMobile()) return;
+
     startX = e.touches[0].clientX;
 
-    // só ativa swipe se começar perto da borda esquerda OU no painel
-    if (startX < 30 || notas.classList.contains('aberto')) {
+    const tela = window.innerWidth;
+
+    // começa swipe:
+    // - perto da direita OU
+    // - dentro do painel aberto
+    if (startX > tela - 30 || notas.classList.contains('aberto')) {
         dragging = true;
     }
 });
 
-// movendo dedo
 document.addEventListener('touchmove', (e) => {
     if (!dragging) return;
-    if (dragging) e.preventDefault();
 
     currentX = e.touches[0].clientX;
     let delta = currentX - startX;
 
-    // se painel fechado → arrasta pra direita
+    // fechado → arrasta pra esquerda (abrindo)
     if (!notas.classList.contains('aberto')) {
-        if (delta > 0) {
-            const limite = Math.min(delta, 300);
-            notas.style.transform = `translateX(${limite - 100}%)`;
+        if (delta < 0) {
+            const limite = Math.max(delta, -300);
+            notas.style.transform = `translateX(${limite + 100}%)`;
         }
     }
 
-    // se painel aberto → arrasta pra esquerda
+    // aberto → arrasta pra direita (fechando)
     else {
-        if (delta < 0) {
-            const limite = Math.max(delta, -300);
+        if (delta > 0) {
+            const limite = Math.min(delta, 300);
             notas.style.transform = `translateX(${limite}px)`;
         }
     }
+
+    e.preventDefault(); // evita scroll enquanto arrasta
 });
 
-// solta o dedo
 document.addEventListener('touchend', () => {
     if (!dragging) return;
 
@@ -479,23 +485,22 @@ document.addEventListener('touchend', () => {
     notas.style.transition = 'transform 0.3s ease';
 
     // abrir
-    if (!notas.classList.contains('aberto') && delta > 80) {
+    if (!notas.classList.contains('aberto') && delta < -80) {
         abrirNotas();
     }
     // fechar
-    else if (notas.classList.contains('aberto') && delta < -80) {
+    else if (notas.classList.contains('aberto') && delta > 80) {
         fecharNotas();
     }
-    // voltar ao estado original
+    // voltar
     else {
         if (notas.classList.contains('aberto')) {
             notas.style.transform = 'translateX(0)';
         } else {
-            notas.style.transform = 'translateX(-100%)';
+            notas.style.transform = 'translateX(100%)';
         }
     }
 
-    // reset
     dragging = false;
     startX = 0;
     currentX = 0;
