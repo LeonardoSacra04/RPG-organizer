@@ -354,3 +354,38 @@ input, select {
 #notas:not(.aberto):hover {
     transform: translateX(-95%);
 }
+
+@media (max-width: 768px) {
+
+    #combate {
+        font-size: 0.9rem;
+    }
+    
+    /* layout volta a ser coluna */
+    .modo-combate #layout {
+        flex-direction: column;
+    }
+
+    /* players ocupa tudo */
+    .modo-combate #players-section {
+        width: 100%;
+    }
+
+    /* combate vai pra baixo */
+    .modo-combate #combate {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    /* grid mais flexível (melhor no celular) */
+    #Aliados, #Inimigos {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    /* sobe a seta no mobile */
+    #toggle-notas {
+        top: 500px;
+        height: 80px;
+        width: 48px;
+    }
+}
