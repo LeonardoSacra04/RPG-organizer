@@ -452,7 +452,7 @@ document.addEventListener('touchstart', (e) => {
     }
 });
 
-const larguraNotas = 300;
+const larguraNotas = notas.offsetWidth;
 
 document.addEventListener('touchmove', (e) => {
     if (!dragging) return;
@@ -460,19 +460,21 @@ document.addEventListener('touchmove', (e) => {
     currentX = e.touches[0].clientX;
     let delta = currentX - startX;
 
+    const largura = notas.offsetWidth;
+
     // FECHADO → abrir (arrasta pra esquerda)
     if (!notas.classList.contains('aberto')) {
         if (delta < 0) {
-            const move = Math.min(larguraNotas, -delta);
-            notas.style.transform = `translateX(${larguraNotas - move}px)`;
+            const move = Math.min(largura, -delta);
+            notas.style.transform = `translateX(${100 - (move / largura) * 100}%)`;
         }
     }
 
     // ABERTO → fechar (arrasta pra direita)
     else {
         if (delta > 0) {
-            const move = Math.min(larguraNotas, delta);
-            notas.style.transform = `translateX(${move}px)`;
+            const move = Math.min(largura, delta);
+            notas.style.transform = `translateX(${(move / largura) * 100}%)`;
         }
     }
 
@@ -499,7 +501,7 @@ document.addEventListener('touchend', () => {
         if (notas.classList.contains('aberto')) {
             notas.style.transform = 'translateX(0)';
         } else {
-            notas.style.transform = `translateX(${larguraNotas}px)`;
+            notas.style.transform = `translateX(100%)`;
         }
     }
 

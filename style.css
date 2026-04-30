@@ -391,7 +391,7 @@ input, select {
         border-right: none;
         border-left: 1px solid #444;
 
-        transform: translateX(300px);
+        transform: translateX(100%);
     }
 
     /* aberto */
