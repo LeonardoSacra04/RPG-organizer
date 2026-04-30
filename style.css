@@ -58,7 +58,7 @@ h1, h2, h3 {
 
     background: #262626;
     border-radius: 12px;
-    padding: 10px;
+    padding: 15px;
 
     border: 1px solid #333;
     box-shadow: 0 4px 10px rgba(0,0,0,0.4);
@@ -85,8 +85,9 @@ h1, h2, h3 {
 #Aliados, #Inimigos {
     display: grid;
     grid-template-columns: repeat(auto-fill, 180px);
-    gap: 12px;
+    gap: 20px;
     justify-content: flex-start;
+    margin-bottom: 30px;
 }
 
 .iniciativa {
@@ -148,7 +149,7 @@ h1, h2, h3 {
 }
 
 /* PLAYER ATIVO */
-.ativo {
+#players-section .ativo {
     border: 2px solid #ffd54f;
     box-shadow: 0 0 10px rgba(255, 213, 79, 0.6);
 
@@ -250,4 +251,104 @@ input, select {
         transform: scale(1);
         box-shadow: 0 0 8px rgba(255, 213, 79, 0.4);
     }
+}
+
+/* OVERLAY ESCURO */
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+
+    z-index: 15;
+}
+
+#overlay.ativo {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#notas {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 360px;
+    max-width: 90%;
+    height: 100vh;
+
+    background: #1e1e1e;
+    border-right: 1px solid #444;
+    box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+
+    z-index: 20;
+}
+
+#notas.aberto {
+    transform: translateX(0);
+}
+
+/* botão seta conectado */
+#toggle-notas {
+    position: absolute;
+    right: -42px;
+    top: 760px;
+
+    width: 42px;
+    height: 70px;
+
+    border-radius: 0px 50px 50px 0px;
+    border-left: none;
+
+    background: #1e1e1e;
+    border: 1px 1px 1px 0px solid #444;
+    color: white;
+
+    font-size: 1.3rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* gira quando aberto */
+.icone-seta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: transform 0.3s ease;
+}
+
+#notas.aberto .icone-seta {
+    transform: rotate(180deg);
+}
+
+#campo-notas {
+    flex: 1;
+    resize: none;
+
+    background: #111;
+    color: white;
+
+    border: 1px solid #555;
+    border-radius: 8px;
+
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 0.95rem;
+}
+
+/* leve puxada quando passa o mouse */
+#notas:not(.aberto):hover {
+    transform: translateX(-95%);
 }

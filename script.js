@@ -7,6 +7,7 @@ const jogo = {
 };
 
 const STORAGE_KEY = 'rpg-organizer';
+const STORAGE_NOTAS = 'rpg-notas';
 
 // salvar
 function salvarJogo() {
@@ -320,6 +321,37 @@ function removerMortos() {
     renderPlayers();
 }
 
+function abrirNotas() {
+    document.getElementById('notas').classList.add('aberto');
+    document.getElementById('overlay').classList.add('ativo');
+    carregarNotas();
+}
+
+function fecharNotas() {
+    document.getElementById('notas').classList.remove('aberto');
+    document.getElementById('overlay').classList.remove('ativo');
+}
+
+function toggleNotas() {
+    const notas = document.getElementById('notas');
+
+    if (notas.classList.contains('aberto')) {
+        fecharNotas();
+    } else {
+        abrirNotas();
+    }
+}
+
+function salvarNotas() {
+    const texto = document.getElementById('campo-notas').value;
+    localStorage.setItem(STORAGE_NOTAS, texto);
+}
+
+function carregarNotas() {
+    const texto = localStorage.getItem(STORAGE_NOTAS) || '';
+    document.getElementById('campo-notas').value = texto;
+}
+
 // ================= VALIDAÇÃO =================
 
 function validarFormularioPlayer() {
@@ -387,6 +419,11 @@ document.getElementById('btn-atacar').onclick = abrirModalAtaque;
 document.getElementById('btn-remover-status').onclick = abrirModalStatus;
 document.getElementById('player-status').onchange = atualizarListaStatus;
 document.getElementById('btn-limpar-mortos').onclick = removerMortos;
+document.getElementById('toggle-notas').onclick = toggleNotas;
+document.getElementById('overlay').onclick = fecharNotas;
+document
+    .getElementById('campo-notas')
+    .addEventListener('input', salvarNotas);
 
 carregarJogo();
 renderPlayers();
