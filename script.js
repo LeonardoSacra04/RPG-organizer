@@ -441,16 +441,18 @@ document.addEventListener('touchstart', (e) => {
     if (!isMobile()) return;
 
     startX = e.touches[0].clientX;
-
     const tela = window.innerWidth;
 
-    // começa swipe:
-    // - perto da direita OU
-    // - dentro do painel aberto
-    if (startX > tela - 30 || notas.classList.contains('aberto')) {
+    // só ativa swipe:
+    if (
+        startX > tela - 40 || // borda direita
+        notas.classList.contains('aberto') // ou painel aberto
+    ) {
         dragging = true;
     }
 });
+
+const larguraNotas = 300;
 
 document.addEventListener('touchmove', (e) => {
     if (!dragging) return;
@@ -458,23 +460,23 @@ document.addEventListener('touchmove', (e) => {
     currentX = e.touches[0].clientX;
     let delta = currentX - startX;
 
-    // fechado → arrasta pra esquerda (abrindo)
+    // FECHADO → abrir (arrasta pra esquerda)
     if (!notas.classList.contains('aberto')) {
         if (delta < 0) {
-            const limite = Math.max(delta, -300);
-            notas.style.transform = `translateX(${limite + 100}%)`;
+            const move = Math.min(larguraNotas, -delta);
+            notas.style.transform = `translateX(${larguraNotas - move}px)`;
         }
     }
 
-    // aberto → arrasta pra direita (fechando)
+    // ABERTO → fechar (arrasta pra direita)
     else {
         if (delta > 0) {
-            const limite = Math.min(delta, 300);
-            notas.style.transform = `translateX(${limite}px)`;
+            const move = Math.min(larguraNotas, delta);
+            notas.style.transform = `translateX(${move}px)`;
         }
     }
 
-    e.preventDefault(); // evita scroll enquanto arrasta
+    e.preventDefault();
 });
 
 document.addEventListener('touchend', () => {
@@ -497,7 +499,7 @@ document.addEventListener('touchend', () => {
         if (notas.classList.contains('aberto')) {
             notas.style.transform = 'translateX(0)';
         } else {
-            notas.style.transform = 'translateX(100%)';
+            notas.style.transform = `translateX(${larguraNotas}px)`;
         }
     }
 
