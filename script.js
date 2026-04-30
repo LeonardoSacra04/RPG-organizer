@@ -425,6 +425,87 @@ document
     .getElementById('campo-notas')
     .addEventListener('input', salvarNotas);
 
+// ================= SWIPE MOBILE =================
+
+let startX = 0;
+let currentX = 0;
+let dragging = false;
+
+const notas = document.getElementById('notas');
+
+// começa o toque
+document.addEventListener('touchstart', (e) => {
+    if (window.innerWidth > 768) return;
+    
+    startX = e.touches[0].clientX;
+
+    // só ativa swipe se começar perto da borda esquerda OU no painel
+    if (startX < 30 || notas.classList.contains('aberto')) {
+        dragging = true;
+    }
+});
+
+// movendo dedo
+document.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    if (dragging) e.preventDefault();
+
+    currentX = e.touches[0].clientX;
+    let delta = currentX - startX;
+
+    // se painel fechado → arrasta pra direita
+    if (!notas.classList.contains('aberto')) {
+        if (delta > 0) {
+            const limite = Math.min(delta, 300);
+            notas.style.transform = `translateX(${limite - 100}%)`;
+        }
+    }
+
+    // se painel aberto → arrasta pra esquerda
+    else {
+        if (delta < 0) {
+            const limite = Math.max(delta, -300);
+            notas.style.transform = `translateX(${limite}px)`;
+        }
+    }
+});
+
+// solta o dedo
+document.addEventListener('touchend', () => {
+    if (!dragging) return;
+
+    let delta = currentX - startX;
+
+    notas.style.transition = 'transform 0.3s ease';
+
+    // abrir
+    if (!notas.classList.contains('aberto') && delta > 80) {
+        abrirNotas();
+    }
+    // fechar
+    else if (notas.classList.contains('aberto') && delta < -80) {
+        fecharNotas();
+    }
+    // voltar ao estado original
+    else {
+        if (notas.classList.contains('aberto')) {
+            notas.style.transform = 'translateX(0)';
+        } else {
+            notas.style.transform = 'translateX(-100%)';
+        }
+    }
+
+    // reset
+    dragging = false;
+    startX = 0;
+    currentX = 0;
+
+    setTimeout(() => {
+        notas.style.transition = '';
+        notas.style.transform = '';
+    }, 300);
+});
+
 carregarJogo();
 renderPlayers();
 validarFormularioPlayer();

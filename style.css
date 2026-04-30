@@ -293,6 +293,8 @@ input, select {
     transition: transform 0.3s ease;
 
     z-index: 20;
+
+    will-change: transform;
 }
 
 #notas.aberto {
