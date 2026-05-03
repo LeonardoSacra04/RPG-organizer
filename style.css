@@ -396,7 +396,8 @@ input, select {
 
     /* grid mais flexível (melhor no celular) */
     #Aliados, #Inimigos {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
     }
 
     /* notas vêm da direita no mobile */
@@ -433,5 +434,27 @@ input, select {
 
     #notas.aberto .icone-seta {
         transform: rotate(180deg);
+    }
+
+    .player-card {
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) {
+
+    #layout {
+        transition: margin-left 0.3s ease;
+    }
+
+    #notas.aberto ~ #layout,
+    body:has(#notas.aberto) #layout {
+        margin-left: 360px;
+    }
+
+    #notas {
+        position: fixed;
+        left: 0;
+        top: 0;
     }
 }

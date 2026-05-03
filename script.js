@@ -146,6 +146,8 @@ function abrirEdicaoPlayer(player) {
     
     jogo.modoEdicao = player;
 
+    document.getElementById('deletar-player').style.display = 'block';
+    
     document.getElementById('nome').value = player.nome;
     document.getElementById('vida').value = player.vida;
     document.getElementById('iniciativa').value = player.iniciativa;
@@ -418,6 +420,8 @@ function validarFormularioPlayer() {
 document.getElementById('btn-criar').onclick = () => {
     jogo.modoEdicao = null;
 
+    document.getElementById('deletar-player').style.display = 'none';
+
     const form = document.getElementById('criando-player');
     form.reset();
 
@@ -503,6 +507,23 @@ document.getElementById('cancelar').onclick = () => {
     jogo.modoEdicao = null; // 🔥 ESSENCIAL
     fecharModal('criando-player');
     validarFormularioPlayer(); // 🔥 volta validação normal
+};
+
+document.getElementById('deletar-player').onclick = () => {
+    if (jogo.modoEdicao === null) return;
+
+    const confirmar = confirm(`Deseja deletar ${jogo.modoEdicao.nome}?`);
+    if (!confirmar) return;
+
+    jogo.players = jogo.players.filter(p => p !== jogo.modoEdicao);
+
+    jogo.modoEdicao = null;
+
+    salvarJogo();
+    renderPlayers();
+    fecharModal('criando-player');
+
+    adicionarLog("Player removido", 'sistema');
 };
 
 document.getElementById('cancelar-ataque').onclick = () => fecharModal('modal-ataque');
