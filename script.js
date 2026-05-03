@@ -129,11 +129,19 @@ function renderPlayers() {
         card.style.cursor = 'pointer';
 
         card.onclick = () => {
+
+            const modalAberto = document.getElementById('criando-player').style.display === 'block';
+            if (modalAberto) return;
+
             if (!player.vivo) {
                 tentarReviver(player);
-            } else {
-                abrirEdicaoPlayer(player);
+                return;
             }
+
+            // 🔒 bloqueia edição em combate
+            if (jogo.emCombate) return;
+
+            abrirEdicaoPlayer(player);
         };
 
         player.aliado
@@ -193,6 +201,11 @@ function renderRodada() {
 // ================= COMBATE =================
 
 function iniciarCombate() {
+
+    // 🔥 cancela edição se estiver aberta
+    jogo.modoEdicao = null;
+    fecharModal('criando-player');
+
     if (jogo.players.length === 0) {
         alert("Adicione players primeiro!");
         return;

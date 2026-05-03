@@ -443,6 +443,8 @@ input, select {
     .modal {
         width: 100%;
         max-width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;   
 
         left: 0;
         bottom: 0;
