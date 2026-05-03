@@ -439,46 +439,6 @@ input, select {
     .player-card {
         width: 100%;
     }
-
-    .modal {
-        position: fixed;
-
-        left: 0;
-        right: 0;
-        bottom: 0;
-        top: auto;
-
-        width: 100%;
-        max-width: 100%;
-
-        max-height: 85vh;
-        overflow-y: auto;
-
-        border-radius: 16px 16px 0 0;
-
-        background: #2a2a2a;
-
-        transform: translateY(100%);
-        animation: subirModal 0.25s ease forwards;
-
-        z-index: 9999;
-    }
-
-    @keyframes subirModal {
-        to {
-            transform: translateY(0);
-        }
-    }
-
-    body.modal-open {
-        overflow: hidden;
-        position: fixed;
-        width: 100%;
-    }
-
-    html, body {
-        height: 100%;
-    }
 }
 
 @media (min-width: 769px) {

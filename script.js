@@ -57,25 +57,14 @@ class Player {
 
 function abrirModal(id) {
     const modal = document.getElementById(id);
-
-    // 🔥 força a tela pro topo
-    window.scrollTo({
-        top: 0,
-        behavior: 'instant'
-    });
-
     modal.style.display = 'block';
-
     document.body.classList.add('blur-active');
-    document.body.classList.add('modal-open');
-    modal.scrollTop = 0;
 }
 
 function fecharModal(id) {
     const modal = document.getElementById(id);
     modal.style.display = 'none';
     document.body.classList.remove('blur-active');
-    document.body.classList.remove('modal-open');
 
     if (modal.tagName === 'FORM') {
         modal.reset();
@@ -212,8 +201,6 @@ function renderRodada() {
 // ================= COMBATE =================
 
 function iniciarCombate() {
-
-    // 🔥 cancela edição se estiver aberta
     jogo.modoEdicao = null;
     fecharModal('criando-player');
 
