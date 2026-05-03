@@ -53,41 +53,52 @@ h1, h2, h3 {
 .player-card {
     position: relative;
 
-    width: 180px;
-    height: 130px;
+    width: 220px;
+    height: 160px;
 
-    background: #262626;
-    border-radius: 12px;
-    padding: 15px;
+    background: linear-gradient(145deg, #2a2a2a, #202020);
+    border-radius: 14px;
+    padding: 16px;
 
     border: 1px solid #333;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.5);
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 
-    overflow: hidden;
-    font-size: 0.85rem;
-
+    font-size: 0.9rem;
     transition: 0.2s;
+
+    backdrop-filter: blur(4px);
+
+    cursor: pointer;
+}
+
+.player-card strong {
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.player-card small {
+    opacity: 0.85;
 }
 
 .player-card:hover {
-    transform: translateY(-3px);
-}
-
-.player-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.6);
 }
 
 #Aliados, #Inimigos {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 180px);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
     justify-content: flex-start;
     margin-bottom: 30px;
+}
+
+#vida-atual {
+    display: none;
 }
 
 .iniciativa {
@@ -95,7 +106,8 @@ h1, h2, h3 {
     top: 6px;
     right: 8px;
 
-    background: #444;
+    background: #555;
+    font-size: 0.8rem;
     padding: 3px 7px;
     border-radius: 8px;
 
@@ -161,6 +173,16 @@ h1, h2, h3 {
     opacity: 0.6;
     background: linear-gradient(145deg, #3a1a1a, #2a1212);
     border-color: #660000;
+}
+
+.player-card.morto {
+    cursor: pointer;
+    filter: grayscale(0.6);
+}
+
+.player-card.morto:hover {
+    transform: scale(1.03);
+    border-color: #ff5252;
 }
 
 /* BOTÕES */

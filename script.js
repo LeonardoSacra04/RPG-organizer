@@ -3,7 +3,8 @@ const jogo = {
     ordemTurno: [],
     turno: 0,
     rodada: 1,
-    emCombate: false
+    emCombate: false,
+    modoEdicao: null // guarda o index do player ou null
 };
 
 const STORAGE_KEY = 'rpg-organizer';
@@ -58,10 +59,6 @@ function abrirModal(id) {
     const modal = document.getElementById(id);
     modal.style.display = 'block';
     document.body.classList.add('blur-active');
-
-    if (modal.tagName === 'FORM') {
-        modal.reset();
-    }
 }
 
 function fecharModal(id) {
@@ -71,6 +68,7 @@ function fecharModal(id) {
 
     if (modal.tagName === 'FORM') {
         modal.reset();
+        validarFormularioPlayer(); // 🔥 garante estado correto
     }
 }
 
@@ -128,10 +126,52 @@ function renderPlayers() {
             <small>${player.status.join(', ') || 'Sem status'}</small>
         `;
 
+        card.style.cursor = 'pointer';
+
+        card.onclick = () => {
+            if (!player.vivo) {
+                tentarReviver(player);
+            } else {
+                abrirEdicaoPlayer(player);
+            }
+        };
+
         player.aliado
             ? aliados.appendChild(card)
             : inimigos.appendChild(card);
     });
+}
+
+function abrirEdicaoPlayer(player) {
+    
+    jogo.modoEdicao = player;
+
+    document.getElementById('nome').value = player.nome;
+    document.getElementById('vida').value = player.vida;
+    document.getElementById('iniciativa').value = player.iniciativa;
+    document.getElementById('lado').value = player.aliado ? '1' : '2';
+
+    const vidaAtualInput = document.getElementById('vida-atual');
+    vidaAtualInput.style.display = 'block';
+    vidaAtualInput.value = player.vidaAtual;
+
+    document.getElementById('salvar').disabled = false;
+
+    abrirModal('criando-player');
+}
+
+function tentarReviver(player) {
+    const confirmar = confirm(`Deseja reviver ${player.nome}?`);
+
+    if (!confirmar) return;
+
+    player.vivo = true;
+    player.vidaAtual = 1;
+
+    salvarJogo();
+    renderPlayers();
+
+    adicionarLog(`${player.nome} foi revivido com 1 HP!`, 'sistema');
 }
 
 function renderRodada() {
@@ -359,6 +399,11 @@ function carregarNotas() {
 // ================= VALIDAÇÃO =================
 
 function validarFormularioPlayer() {
+    if (jogo.modoEdicao !== null) {
+        document.getElementById('salvar').disabled = false;
+        return;
+    }
+    
     const nome = document.getElementById('nome').value.trim();
     const vida = Number(document.getElementById('vida').value);
     const iniciativa = document.getElementById('iniciativa').value;
@@ -370,7 +415,20 @@ function validarFormularioPlayer() {
 
 // ================= EVENTOS =================
 
-document.getElementById('btn-criar').onclick = () => abrirModal('criando-player');
+document.getElementById('btn-criar').onclick = () => {
+    jogo.modoEdicao = null;
+
+    const form = document.getElementById('criando-player');
+    form.reset();
+
+    const vidaAtualInput = document.getElementById('vida-atual');
+    vidaAtualInput.style.display = 'none';
+    vidaAtualInput.value = '';
+
+    validarFormularioPlayer();
+
+    abrirModal('criando-player');
+};
 
 ['nome', 'vida', 'iniciativa'].forEach(id => {
     document.getElementById(id).addEventListener('input', validarFormularioPlayer);
@@ -388,16 +446,45 @@ document.getElementById('criando-player').addEventListener('submit', e => {
 
     if (!nome || vida <= 0 || !iniciativa) return;
 
-    const novo = new Player(nome, vida, iniciativa, lado);
-    jogo.players.push(novo);
-    salvarJogo();
+    if (jogo.modoEdicao !== null) {
+        const p = jogo.modoEdicao;
 
+        const vidaAtualInput = document.getElementById('vida-atual').value;
+
+        p.nome = nome;
+        p.vida = vida;
+        p.iniciativa = Number(iniciativa);
+        p.aliado = lado;
+
+        // 🔥 VIDA ATUAL EDITÁVEL
+        if (vidaAtualInput !== '') {
+            let novaVidaAtual = Number(vidaAtualInput);
+
+            // não pode ser maior que vida total
+            novaVidaAtual = Math.min(novaVidaAtual, vida);
+
+            // não pode ser negativa
+            novaVidaAtual = Math.max(novaVidaAtual, 0);
+
+            p.vidaAtual = novaVidaAtual;
+
+            // define se está vivo ou morto
+            p.vivo = novaVidaAtual > 0;
+        }
+
+        jogo.modoEdicao = null;
+    } else {
+        const novo = new Player(nome, vida, iniciativa, lado);
+        jogo.players.push(novo);
+    }
+
+    salvarJogo();
     renderPlayers();
 
     form.reset(); // limpa inputs
 
     // 🔥 força botão voltar ao estado inicial
-    document.getElementById('salvar').disabled = true;
+    validarFormularioPlayer();
 
     fecharModal('criando-player');
 });
@@ -412,7 +499,12 @@ document.getElementById('modal-status').addEventListener('submit', e => {
     removerStatus();
 });
 
-document.getElementById('cancelar').onclick = () => fecharModal('criando-player');
+document.getElementById('cancelar').onclick = () => {
+    jogo.modoEdicao = null; // 🔥 ESSENCIAL
+    fecharModal('criando-player');
+    validarFormularioPlayer(); // 🔥 volta validação normal
+};
+
 document.getElementById('cancelar-ataque').onclick = () => fecharModal('modal-ataque');
 document.getElementById('cancelar-remocao').onclick = () => fecharModal('modal-status');
 
