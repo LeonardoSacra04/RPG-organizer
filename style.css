@@ -441,25 +441,36 @@ input, select {
     }
 
     .modal {
-        width: 100%;
-        max-width: 100%;
-        max-height: 90vh;
-        overflow-y: auto;   
+        position: fixed;
 
         left: 0;
+        right: 0;
         bottom: 0;
         top: auto;
 
-        transform: translateY(100%);
+        width: 100%;
+        max-width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        
+        margin: 0;
+
         border-radius: 16px 16px 0 0;
 
-        animation: subirModal 0.3s ease forwards;
+        transform: translateY(100%);
+        animation: subirModal 0.25s ease forwards;
+
+        z-index: 999; /* 🔥 garante que fica por cima */
     }
 
     @keyframes subirModal {
         to {
             transform: translateY(0);
         }
+    }
+
+    body.modal-open {
+        overflow: hidden;
     }
 }
 
