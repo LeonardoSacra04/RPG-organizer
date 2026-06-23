@@ -112,18 +112,31 @@ function renderPlayers() {
 
         // 👇 usa aqui
         card.innerHTML = `
-            <div class="iniciativa">${player.iniciativa}</div>
-
-            <strong>${player.nome}</strong>
-
-            <div>
-                <div class="barra-vida">
-                    <span style="width: ${porcentagem}%; background: ${cor}"></span>
+            <div class="player-header">
+                <div class="avatar">
+                    <img src="/images/generic-icon.png" alt="Avatar">
                 </div>
-                <small>${player.vidaAtual}/${player.vida} HP</small>
-            </div>
 
-            <small>${player.status.join(', ') || 'Sem status'}</small>
+                <div class="player-info">
+                    <h3>${player.nome}</h3>
+
+                    <div class="hp-text">
+                        ${player.vidaAtual}/${player.vida} HP
+                    </div>
+
+                    <div class="barra-vida">
+                        <span style="width:${porcentagem}%; background:${cor}"> </span>
+                    </div>
+
+                    <div class="status">
+                        ${player.status.join(', ') || 'Sem status'}
+                    </div>
+                </div>
+
+                <div class="iniciativa">
+                    ${player.iniciativa}
+                </div>
+            </div>
         `;
 
         card.style.cursor = 'pointer';
