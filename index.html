@@ -64,21 +64,25 @@
 
 <!-- MODAL PLAYER -->
 <form id="criando-player" class="modal">
-    <h2>Novo Personagem</h2>
+    <article id="preview-card" class="player-card"></article>
+    <div class="editor-fields">
+        <input type="text" id="nome" placeholder="Nome" required>
+        <input type="number" id="vida" placeholder="Vida" required>
+        <input type="number" id="vida-atual" placeholder="Vida Atual">
+        <input type="number" id="iniciativa" placeholder="Iniciativa" required>
+        <select id="lado">
+            <option value="1">Aliado</option>
+            <option value="2">Inimigo</option>
+        </select>
 
-    <input type="text" id="nome" placeholder="Nome" required>
-    <input type="number" id="vida" placeholder="Vida" required>
-    <input type="number" id="vida-atual" placeholder="Vida Atual">
-    <input type="number" id="iniciativa" placeholder="Iniciativa" required>
+        <button type="submit" id="salvar">Salvar</button>
+        <button type="button" id="cancelar">Cancelar</button>
+        <button type="button" id="deletar-player">Deletar</button>
+    </div>
 
-    <select id="lado">
-        <option value="1">Aliado</option>
-        <option value="2">Inimigo</option>
-    </select>
+    
 
-    <button type="submit" id="salvar">Salvar</button>
-    <button type="button" id="cancelar">Cancelar</button>
-    <button type="button" id="deletar-player">Deletar</button>
+    
 </form>
 
 <!-- MODAL ATAQUE -->

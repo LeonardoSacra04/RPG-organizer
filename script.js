@@ -163,6 +163,59 @@ function renderPlayers() {
     });
 }
 
+function renderPreviewCard() {
+
+    const nome =
+        document.getElementById('nome').value || 'Novo Player';
+
+    const vida =
+        Number(document.getElementById('vida').value) || 10;
+
+    const vidaAtual =
+        Number(document.getElementById('vida-atual').value) || vida;
+
+    const iniciativa =
+        Number(document.getElementById('iniciativa').value) || 0;
+
+    const porcentagem =
+        (vidaAtual / vida) * 100;
+
+    const preview =
+        document.getElementById('preview-card');
+
+    preview.innerHTML = `
+        <div class="player-header">
+
+            <div class="avatar">
+                <img src="/images/generic-icon.png">
+            </div>
+
+            <div class="player-info">
+
+                <h3>${nome}</h3>
+
+                <div class="hp-text">
+                    ${vidaAtual}/${vida} HP
+                </div>
+
+                <div class="barra-vida">
+                    <span style="width:${porcentagem}%"></span>
+                </div>
+
+                <div class="status">
+                    Sem status
+                </div>
+
+            </div>
+
+            <div class="iniciativa">
+                ${iniciativa}
+            </div>
+
+        </div>
+    `;
+}
+
 function abrirEdicaoPlayer(player) {
     
     jogo.modoEdicao = player;
@@ -173,6 +226,8 @@ function abrirEdicaoPlayer(player) {
     document.getElementById('vida').value = player.vida;
     document.getElementById('iniciativa').value = player.iniciativa;
     document.getElementById('lado').value = player.aliado ? '1' : '2';
+
+    renderPreviewCard();
 
     const vidaAtualInput = document.getElementById('vida-atual');
     vidaAtualInput.style.display = 'block';
@@ -454,13 +509,14 @@ document.getElementById('btn-criar').onclick = () => {
     vidaAtualInput.value = '';
 
     validarFormularioPlayer();
-
+    renderPreviewCard();
     abrirModal('criando-player');
 };
 
-['nome', 'vida', 'iniciativa'].forEach(id => {
-    document.getElementById(id).addEventListener('input', validarFormularioPlayer);
-});
+['nome', 'vida', 'vida-atual', 'iniciativa', 'lado'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+        renderPreviewCard();
+        validarFormularioPlayer();});});
 
 document.getElementById('criando-player').addEventListener('submit', e => {
     e.preventDefault();

@@ -167,6 +167,21 @@ h1, h2, h3 {
     border-left: 4px solid #f44336;
 }
 
+#criando-player {
+    width: 700px;
+    max-width: 95vw;
+}
+
+#preview-card {
+    margin-bottom: 20px;
+}
+
+.editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 /* BARRA DE VIDA */
 .barra-vida {
     width: 100%;
