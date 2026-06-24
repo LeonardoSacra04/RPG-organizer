@@ -114,7 +114,7 @@ function renderPlayers() {
         card.innerHTML = `
             <div class="player-header">
                 <div class="avatar">
-                    <img src="/images/generic-icon.png" alt="Avatar">
+                    <img src="images/generic-icon.png" alt="Avatar">
                 </div>
 
                 <div class="player-info">
