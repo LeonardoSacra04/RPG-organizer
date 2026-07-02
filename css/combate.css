@@ -1,0 +1,103 @@
+/* combate começa escondido */
+#combate {
+    display: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* quando combate ativo */
+.modo-combate #layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.modo-combate .player-card {
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.modo-combate .player-card.ativo {
+    opacity: 1;
+}
+
+/* players ocupa 70% */
+.modo-combate #players-section {
+    width: 70%;
+}
+
+/* combate ocupa 30% e aparece */
+.modo-combate #combate {
+    display: block;
+    width: 30%;
+    background: #121212;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #333;
+}
+
+/* PLAYER ATIVO */
+#players-section .ativo {
+    border: 2px solid #ffd54f;
+    box-shadow: 0 0 10px rgba(255, 213, 79, 0.6);
+
+    animation: pulseTurno 1.5s infinite;
+}
+
+/* LOG */
+#log-container {
+    margin-top: 20px;
+    background: #111;
+    padding: 10px;
+    border-radius: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#log-combate p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+}
+
+/* CORES DO LOG */
+.log-ataque { color: #4caf50; }
+.log-morte { color: #f44336; font-weight: bold; }
+.log-status { color: #9c27b0; }
+.log-sistema { color: #ccc; }
+
+@keyframes pulseTurno {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 8px rgba(255, 213, 79, 0.4);
+    }
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 18px rgba(255, 213, 79, 0.9);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 8px rgba(255, 213, 79, 0.4);
+    }
+}
+
+@media (max-width: 768px) {
+
+    #combate {
+        font-size: 0.9rem;
+    }
+
+    /* layout volta a ser coluna */
+    .modo-combate #layout {
+        flex-direction: column;
+    }
+
+    /* players ocupa tudo */
+    .modo-combate #players-section {
+        width: 100%;
+    }
+
+    /* combate vai pra baixo */
+    .modo-combate #combate {
+        width: 100%;
+        margin-top: 15px;
+    }
+}

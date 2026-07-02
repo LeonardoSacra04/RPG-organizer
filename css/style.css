@@ -1,0 +1,101 @@
+/* RESET BÁSICO */
+* {
+    box-sizing: border-box;
+}
+
+#layout {
+    display: block;
+    padding: 20px;
+}
+
+/* BODY */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1b1b1b;
+    color: #eee;
+    margin: 0;
+}
+
+/* TITULOS */
+h1, h2, h3 {
+    margin-bottom: 10px;
+}
+
+/* BOTÕES */
+button {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 8px 12px;
+    margin: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #444;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* INPUTS */
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #222;
+    color: #fff;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #555;
+    z-index: 10;
+    min-width: 250px;
+}
+
+/* BLUR */
+.blur-active main,
+.blur-active #botoes,
+.blur-active #layout {
+    filter: blur(3px);
+}
+
+/* OVERLAY ESCURO */
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+
+    z-index: 15;
+}
+
+#overlay.ativo {
+    opacity: 1;
+    pointer-events: all;
+}
+
+@media (min-width: 769px) {
+
+    #layout {
+        transition: margin-left 0.3s ease;
+    }
+}
