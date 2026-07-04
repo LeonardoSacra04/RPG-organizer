@@ -300,6 +300,8 @@ function abrirEdicaoPlayer(player) {
     document.getElementById('lado').value = player.aliado ? '1' : '2';
     imagemSelecionada = player.imagem;
 
+    
+
     renderPreviewCard();
 
     const vidaAtualInput = document.getElementById('vida-atual');
