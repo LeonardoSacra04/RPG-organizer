@@ -1,10 +1,11 @@
 class Player {
-    constructor(nome, vida, iniciativa, aliado) {
+    constructor(nome, vida, iniciativa, aliado, imagem = "images/generic-icon.png") {
         this.nome = nome;
         this.vida = Number(vida);
         this.vidaAtual = this.vida;
         this.iniciativa = Number(iniciativa);
         this.aliado = aliado;
+        this.imagem = imagem;
         this.vivo = true;
         this.status = [];
     }
@@ -17,6 +18,8 @@ class Player {
         }
     }
 }
+
+let imagemSelecionada = "images/generic-icon.png";
 
 // ================= RENDER =================
 
@@ -49,7 +52,7 @@ function renderPlayers() {
         card.innerHTML = `
             <div class="player-header">
                 <div class="avatar">
-                    <img src="images/generic-icon.png" alt="Avatar">
+                    <img src="${player.imagem}" alt="Avatar">
                 </div>
 
                 <div class="player-info">
@@ -115,6 +118,8 @@ function renderPreviewCard() {
     const porcentagem =
         (vidaAtual / vida) * 100;
 
+    const imagem = imagemSelecionada;
+
     const preview =
         document.getElementById('preview-card');
 
@@ -122,7 +127,7 @@ function renderPreviewCard() {
         <div class="player-header">
 
             <div class="avatar">
-                <img src="/images/generic-icon.png">
+                <img src="${imagem}">
             </div>
 
             <div class="player-info">
@@ -173,6 +178,17 @@ document.getElementById('deletar-player').onclick = () => {
         renderPreviewCard();
         validarFormularioPlayer();});});
 
+document.getElementById("imagem-player").addEventListener("change", function () {
+    const arquivo = this.files[0];
+    if (!arquivo) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        imagemSelecionada = e.target.result;
+        renderPreviewCard();
+    };
+    reader.readAsDataURL(arquivo);
+});
+
 document.getElementById('criando-player').addEventListener('submit', e => {
     e.preventDefault();
 
@@ -194,6 +210,7 @@ document.getElementById('criando-player').addEventListener('submit', e => {
         p.vida = vida;
         p.iniciativa = Number(iniciativa);
         p.aliado = lado;
+        p.imagem = imagemSelecionada;;
 
         // 🔥 VIDA ATUAL EDITÁVEL
         if (vidaAtualInput !== '') {
@@ -213,7 +230,7 @@ document.getElementById('criando-player').addEventListener('submit', e => {
 
         jogo.modoEdicao = null;
     } else {
-        const novo = new Player(nome, vida, iniciativa, lado);
+        const novo = new Player(nome, vida, iniciativa, lado, imagemSelecionada);
         jogo.players.push(novo);
     }
 
@@ -237,6 +254,7 @@ document.getElementById('btn-criar').onclick = () => {
 
     const form = document.getElementById('criando-player');
     form.reset();
+    imagemSelecionada = "images/generic-icon.png";
 
     const vidaAtualInput = document.getElementById('vida-atual');
     vidaAtualInput.style.display = 'none';
@@ -280,6 +298,7 @@ function abrirEdicaoPlayer(player) {
     document.getElementById('vida').value = player.vida;
     document.getElementById('iniciativa').value = player.iniciativa;
     document.getElementById('lado').value = player.aliado ? '1' : '2';
+    imagemSelecionada = player.imagem;
 
     renderPreviewCard();
 

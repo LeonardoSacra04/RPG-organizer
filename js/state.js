@@ -25,7 +25,7 @@ function carregarJogo() {
 
     // recria como instâncias da classe Player
     jogo.players = playersSalvos.map(p => {
-        const player = new Player(p.nome, p.vida, p.iniciativa, p.aliado);
+        const player = new Player(p.nome, p.vida, p.iniciativa, p.aliado, p.imagem);
         player.vidaAtual = p.vidaAtual;
         player.vivo = p.vivo;
         player.status = p.status || [];
