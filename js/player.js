@@ -1,3 +1,4 @@
+// classe com todas as informações padrão do player
 class Player {
     constructor(nome, vida, iniciativa, aliado, imagem = "images/generic-icon.png") {
         this.nome = nome;
@@ -19,10 +20,10 @@ class Player {
     }
 }
 
+// variável para facilitar acesso à imagem
 let imagemSelecionada = "images/generic-icon.png";
 
-// ================= RENDER =================
-
+// atualiza e renderiza os players na página
 function renderPlayers() {
     const aliados = document.getElementById('Aliados');
     const inimigos = document.getElementById('Inimigos');
@@ -41,14 +42,14 @@ function renderPlayers() {
             card.classList.add('ativo');
         }
 
-        // 🔥 AQUI
+        // define a barra de vida
         const porcentagem = (player.vidaAtual / player.vida) * 100;
 
         let cor = '#4caf50';
         if (porcentagem <= 50) cor = '#ff9800';
         if (porcentagem <= 25) cor = '#f44336';
 
-        // 👇 usa aqui
+        // cria o design dos cards
         card.innerHTML = `
             <div class="player-header">
                 <div class="avatar">
@@ -80,7 +81,6 @@ function renderPlayers() {
         card.style.cursor = 'pointer';
 
         card.onclick = () => {
-
             const modalAberto = document.getElementById('criando-player').style.display === 'block';
             if (modalAberto) return;
 
@@ -89,7 +89,7 @@ function renderPlayers() {
                 return;
             }
 
-            // 🔒 bloqueia edição em combate
+            // bloqueia edição em combate
             if (jogo.emCombate) return;
 
             abrirEdicaoPlayer(player);
@@ -101,6 +101,7 @@ function renderPlayers() {
     });
 }
 
+// renderiza em tempo real a pré vizualização do card ao adicionar/editar player
 function renderPreviewCard() {
 
     const nome =
@@ -156,6 +157,47 @@ function renderPreviewCard() {
     `;
 }
 
+// passa as informações dos campos do modal para o card do player
+function validarFormularioPlayer() {
+    if (jogo.modoEdicao !== null) {
+        document.getElementById('salvar').disabled = false;
+        return;
+    }
+    
+    const nome = document.getElementById('nome').value.trim();
+    const vida = Number(document.getElementById('vida').value);
+    const iniciativa = document.getElementById('iniciativa').value;
+
+    const valido = nome.length > 0 && vida > 0 && iniciativa !== '';
+
+    document.getElementById('salvar').disabled = !valido;
+}
+
+// ao editar um player, puxa as informações do player para o modal
+function abrirEdicaoPlayer(player) {
+    
+    jogo.modoEdicao = player;
+
+    document.getElementById('deletar-player').style.display = 'block';
+    
+    document.getElementById('nome').value = player.nome;
+    document.getElementById('vida').value = player.vida;
+    document.getElementById('iniciativa').value = player.iniciativa;
+    document.getElementById('lado').value = player.aliado ? '1' : '2';
+    imagemSelecionada = player.imagem;
+
+    renderPreviewCard();
+
+    const vidaAtualInput = document.getElementById('vida-atual');
+    vidaAtualInput.style.display = 'block';
+    vidaAtualInput.value = player.vidaAtual;
+
+    document.getElementById('salvar').disabled = false;
+
+    abrirModal('criando-player');
+}
+
+// DOM ligado a opção de deletar um player na edição
 document.getElementById('deletar-player').onclick = () => {
     if (jogo.modoEdicao === null) return;
 
@@ -173,11 +215,15 @@ document.getElementById('deletar-player').onclick = () => {
     adicionarLog("Player removido", 'sistema');
 };
 
+// DOM para resgatar as informações do formulário de criação/edição para adicionar ao player
 ['nome', 'vida', 'vida-atual', 'iniciativa', 'lado'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
         renderPreviewCard();
-        validarFormularioPlayer();});});
+        validarFormularioPlayer();}
+    );}
+);
 
+// DOM ligado a seleção da imagem para o player
 document.getElementById("imagem-player").addEventListener("change", function () {
     const arquivo = this.files[0];
     if (!arquivo) return;
@@ -189,6 +235,7 @@ document.getElementById("imagem-player").addEventListener("change", function () 
     reader.readAsDataURL(arquivo);
 });
 
+// DOM ligado ao botão de confirmação ao criar um player
 document.getElementById('criando-player').addEventListener('submit', e => {
     e.preventDefault();
 
@@ -212,7 +259,7 @@ document.getElementById('criando-player').addEventListener('submit', e => {
         p.aliado = lado;
         p.imagem = imagemSelecionada;;
 
-        // 🔥 VIDA ATUAL EDITÁVEL
+        // vida atual editável
         if (vidaAtualInput !== '') {
             let novaVidaAtual = Number(vidaAtualInput);
 
@@ -237,16 +284,15 @@ document.getElementById('criando-player').addEventListener('submit', e => {
     salvarJogo();
     renderPlayers();
 
-    form.reset(); // limpa inputs
+    form.reset();
 
-    // 🔥 força botão voltar ao estado inicial
+    // força botão voltar ao estado inicial
     validarFormularioPlayer();
 
     fecharModal('criando-player');
 });
 
-// ================= EVENTOS =================
-
+// DOM ligado ao botão para criar um player
 document.getElementById('btn-criar').onclick = () => {
     jogo.modoEdicao = null;
 
@@ -265,50 +311,9 @@ document.getElementById('btn-criar').onclick = () => {
     abrirModal('criando-player');
 };
 
+// cancela as alterações feitas na edição
 document.getElementById('cancelar').onclick = () => {
-    jogo.modoEdicao = null; // 🔥 ESSENCIAL
+    jogo.modoEdicao = null;
     fecharModal('criando-player');
-    validarFormularioPlayer(); // 🔥 volta validação normal
+    validarFormularioPlayer();
 };
-
-// ================= VALIDAÇÃO =================
-
-function validarFormularioPlayer() {
-    if (jogo.modoEdicao !== null) {
-        document.getElementById('salvar').disabled = false;
-        return;
-    }
-    
-    const nome = document.getElementById('nome').value.trim();
-    const vida = Number(document.getElementById('vida').value);
-    const iniciativa = document.getElementById('iniciativa').value;
-
-    const valido = nome.length > 0 && vida > 0 && iniciativa !== '';
-
-    document.getElementById('salvar').disabled = !valido;
-}
-
-function abrirEdicaoPlayer(player) {
-    
-    jogo.modoEdicao = player;
-
-    document.getElementById('deletar-player').style.display = 'block';
-    
-    document.getElementById('nome').value = player.nome;
-    document.getElementById('vida').value = player.vida;
-    document.getElementById('iniciativa').value = player.iniciativa;
-    document.getElementById('lado').value = player.aliado ? '1' : '2';
-    imagemSelecionada = player.imagem;
-
-    
-
-    renderPreviewCard();
-
-    const vidaAtualInput = document.getElementById('vida-atual');
-    vidaAtualInput.style.display = 'block';
-    vidaAtualInput.value = player.vidaAtual;
-
-    document.getElementById('salvar').disabled = false;
-
-    abrirModal('criando-player');
-}

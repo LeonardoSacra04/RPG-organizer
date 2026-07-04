@@ -1,3 +1,4 @@
+// objeto que guarda todas as informações necessárias para o sistema
 const jogo = {
     players: [],
     ordemTurno: [],
@@ -7,6 +8,7 @@ const jogo = {
     modoEdicao: null // guarda o index do player ou null
 };
 
+// Ligação com LocalStorage
 const STORAGE_KEY = 'rpg-organizer';
 const STORAGE_NOTAS = 'rpg-notas';
 
@@ -33,8 +35,7 @@ function carregarJogo() {
     });
 }
 
-// ================= UTIL =================
-
+// efeito de blur quando qualquer modal está aberto
 function abrirModal(id) {
     const modal = document.getElementById(id);
     modal.style.display = 'block';
@@ -52,6 +53,7 @@ function fecharModal(id) {
     }
 }
 
+// busca as informações salvas no LocalStorage ao iniciar
 carregarJogo();
 renderPlayers();
 validarFormularioPlayer();

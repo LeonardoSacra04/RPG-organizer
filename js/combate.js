@@ -1,5 +1,4 @@
-// ================= COMBATE =================
-
+// inicia o combate
 function iniciarCombate() {
     jogo.modoEdicao = null;
     fecharModal('criando-player');
@@ -24,6 +23,7 @@ function iniciarCombate() {
     renderPlayers();
 }
 
+// finaliza o combate
 function finalizarCombate() {
     jogo.emCombate = false;
     jogo.ordemTurno = [];
@@ -39,6 +39,7 @@ function finalizarCombate() {
     renderRodada();
 }
 
+// passa para o próximo turno do combate
 function proximoTurno() {
     if (!jogo.emCombate) return;
 
@@ -54,8 +55,7 @@ function proximoTurno() {
     renderPlayers();
 }
 
-// ================= ATAQUE =================
-
+// abre campo para definir a ação do ataque
 function abrirModalAtaque() {
     const select = document.getElementById('alvo');
     select.innerHTML = '';
@@ -74,6 +74,7 @@ function abrirModalAtaque() {
     abrirModal('modal-ataque');
 }
 
+// confirma a ação do ataque
 function confirmarAtaque() {
     const alvoIndex = Number(document.getElementById('alvo').value);
     const dano = Number(document.getElementById('dano').value);
@@ -108,8 +109,7 @@ function confirmarAtaque() {
     renderPlayers();
 }
 
-// ================= STATUS =================
-
+// abre campo para definir a ação da remoção de status
 function abrirModalStatus() {
     const select = document.getElementById('player-status');
     select.innerHTML = '';
@@ -132,6 +132,7 @@ function abrirModalStatus() {
     abrirModal('modal-status');
 }
 
+// adiciona status dependendo da ação do usuário
 function atualizarListaStatus() {
     const playerIndex = document.getElementById('player-status').value;
     const lista = document.getElementById('lista-status');
@@ -149,6 +150,7 @@ function atualizarListaStatus() {
     });
 }
 
+// remove status dependendo da ação do usuário
 function removerStatus() {
     const playerIndex = document.getElementById('player-status').value;
     const statusIndex = document.getElementById('lista-status').value;
@@ -165,6 +167,7 @@ function removerStatus() {
     renderPlayers();
 }
 
+// mostra um log das ações do combate
 function adicionarLog(texto, tipo = 'sistema') {
     const log = document.getElementById('log-combate');
 
@@ -176,8 +179,7 @@ function adicionarLog(texto, tipo = 'sistema') {
     log.scrollTop = log.scrollHeight;
 }
 
-// ================= OUTROS =================
-
+// remove os players mortos
 function removerMortos() {
     jogo.players = jogo.players.filter(p => p.vivo);
     salvarJogo();
@@ -185,6 +187,7 @@ function removerMortos() {
     renderPlayers();
 }
 
+// pergunta ao usuário se realmente quer reviver um player
 function tentarReviver(player) {
     const confirmar = confirm(`Deseja reviver ${player.nome}?`);
 
@@ -199,6 +202,7 @@ function tentarReviver(player) {
     adicionarLog(`${player.nome} foi revivido com 1 HP!`, 'sistema');
 }
 
+// conta em qual rodada está e de quem é a vez, quando todos jogarem, vai para a próxima rodada
 function renderRodada() {
     const rodadaEl = document.getElementById('rodada');
 
@@ -213,16 +217,17 @@ function renderRodada() {
         jogo.ordemTurno[jogo.turno].player.nome;
 }
 
+// listeners dos modais
 document.getElementById('modal-ataque').addEventListener('submit', e => {
     e.preventDefault();
     confirmarAtaque();
 });
-
 document.getElementById('modal-status').addEventListener('submit', e => {
     e.preventDefault();
     removerStatus();
 });
 
+// DOM ligado aos botões do combate
 document.getElementById('cancelar-ataque').onclick = () => fecharModal('modal-ataque');
 document.getElementById('cancelar-remocao').onclick = () => fecharModal('modal-status');
 document.getElementById('btn-combate').onclick = iniciarCombate;
@@ -230,5 +235,7 @@ document.getElementById('btn-passar').onclick = proximoTurno;
 document.getElementById('btn-finalizar').onclick = finalizarCombate;
 document.getElementById('btn-atacar').onclick = abrirModalAtaque;
 document.getElementById('btn-remover-status').onclick = abrirModalStatus;
-document.getElementById('player-status').onchange = atualizarListaStatus;
 document.getElementById('btn-limpar-mortos').onclick = removerMortos;
+
+// atualiza a lista de status do player
+document.getElementById('player-status').onchange = atualizarListaStatus;
