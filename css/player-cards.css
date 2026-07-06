@@ -402,6 +402,7 @@ input::-webkit-outer-spin-button {
     width: 100%;
 }
 
+
 /* RESPONSIVIDADE E USABILIDADE MOBILE DO MODAL */
 @media (max-width: 768px) {
     /* Força o modal a ter largura responsiva baseada na viewport, ignorando o width: 700px do desktop */
