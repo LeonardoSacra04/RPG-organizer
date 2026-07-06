@@ -23,6 +23,66 @@ class Player {
 // variável para facilitar acesso à imagem
 let imagemSelecionada = "images/generic-icon.png";
 
+// constantes para definir a largura do input de vida e vida atual
+const vida = document.getElementById("vida");
+const vidaAtual = document.getElementById("vida-atual");
+
+// função para definir a largura do input de vida e vida atual
+function ajustarWidth() {
+    const digitos = Math.max(1, vida.value.length);
+    const digitosAtual = Math.max(1, vidaAtual.value.length);
+    vida.style.width = `${digitos}ch`;
+    vidaAtual.style.width = `${digitosAtual}ch`;
+}
+
+// função para atualizar a borda lateral do card no modal de acordo com o lado selecionado
+function atualizarBordaModal() {
+    const ladoSelect = document.getElementById('lado');
+    const modal = document.querySelector('#criando-player .modal-player-card');
+    if (!modal) return;
+    
+    if (ladoSelect.value === '1') {
+        modal.classList.add('modal-card-aliado');
+        modal.classList.remove('modal-card-inimigo');
+    } else {
+        modal.classList.add('modal-card-inimigo');
+        modal.classList.remove('modal-card-aliado');
+    }
+}
+
+// função para atualizar a barra de vida do preview no modal
+function atualizarVidaModal() {
+    const total = Number(document.getElementById('vida').value) || 0;
+    const atualInput = document.getElementById('vida-atual');
+    
+    // Na criação de player, o input de vidaAtual está oculto. Nesse caso, a vida atual é igual à total.
+    let atual = total;
+    if (atualInput.style.display !== 'none' && atualInput.value !== '') {
+        atual = Number(atualInput.value);
+    }
+    
+    const barra = document.getElementById('preview-barra-vida');
+    if (!barra) return;
+    
+    if (total <= 0) {
+        barra.style.width = '0%';
+        return;
+    }
+    
+    const porcentagem = Math.max(0, Math.min(100, (atual / total) * 100));
+    barra.style.width = `${porcentagem}%`;
+    
+    let cor = '#4caf50';
+    if (porcentagem <= 50) cor = '#ff9800';
+    if (porcentagem <= 25) cor = '#f44336';
+    barra.style.background = cor;
+}
+
+// listeners para definir a largura do input de vida e vida atual e atualizar o preview
+vidaAtual.addEventListener("input", ajustarWidth);
+vida.addEventListener("input", ajustarWidth);
+document.getElementById('lado').addEventListener('change', atualizarBordaModal);
+
 // atualiza e renderiza os players na página
 function renderPlayers() {
     const aliados = document.getElementById('Aliados');
@@ -101,62 +161,6 @@ function renderPlayers() {
     });
 }
 
-// renderiza em tempo real a pré vizualização do card ao adicionar/editar player
-function renderPreviewCard() {
-
-    const nome =
-        document.getElementById('nome').value || 'Novo Player';
-
-    const vida =
-        Number(document.getElementById('vida').value) || 10;
-
-    const vidaAtual =
-        Number(document.getElementById('vida-atual').value) || vida;
-
-    const iniciativa =
-        Number(document.getElementById('iniciativa').value) || 0;
-
-    const porcentagem =
-        (vidaAtual / vida) * 100;
-
-    const imagem = imagemSelecionada;
-
-    const preview =
-        document.getElementById('preview-card');
-
-    preview.innerHTML = `
-        <div class="player-header">
-
-            <div class="avatar">
-                <img src="${imagem}">
-            </div>
-
-            <div class="player-info">
-
-                <h3>${nome}</h3>
-
-                <div class="hp-text">
-                    ${vidaAtual}/${vida} HP
-                </div>
-
-                <div class="barra-vida">
-                    <span style="width:${porcentagem}%"></span>
-                </div>
-
-                <div class="status">
-                    Sem status
-                </div>
-
-            </div>
-
-            <div class="iniciativa">
-                ${iniciativa}
-            </div>
-
-        </div>
-    `;
-}
-
 // passa as informações dos campos do modal para o card do player
 function validarFormularioPlayer() {
     if (jogo.modoEdicao !== null) {
@@ -185,15 +189,24 @@ function abrirEdicaoPlayer(player) {
     document.getElementById('iniciativa').value = player.iniciativa;
     document.getElementById('lado').value = player.aliado ? '1' : '2';
     imagemSelecionada = player.imagem;
-
-    renderPreviewCard();
+    document.getElementById("preview-avatar").src = player.imagem;
 
     const vidaAtualInput = document.getElementById('vida-atual');
+    const removeP = document.getElementById('remove-p');
     vidaAtualInput.style.display = 'block';
+    removeP.style.display = "block";
     vidaAtualInput.value = player.vidaAtual;
 
     document.getElementById('salvar').disabled = false;
 
+    const previewStatus = document.getElementById('preview-status');
+    if (previewStatus) {
+        previewStatus.textContent = player.status.join(', ') || 'Sem status';
+    }
+
+    ajustarWidth();
+    atualizarBordaModal();
+    atualizarVidaModal();
     abrirModal('criando-player');
 }
 
@@ -218,10 +231,17 @@ document.getElementById('deletar-player').onclick = () => {
 // DOM para resgatar as informações do formulário de criação/edição para adicionar ao player
 ['nome', 'vida', 'vida-atual', 'iniciativa', 'lado'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
-        renderPreviewCard();
-        validarFormularioPlayer();}
-    );}
-);
+        validarFormularioPlayer();
+        if (id === 'vida' || id === 'vida-atual') {
+            atualizarVidaModal();
+        }
+    });
+});
+
+// DOM para abrir o seletor de arquivos ao clicar na imagem de preview
+document.getElementById("preview-avatar").addEventListener("click", () => {
+    document.getElementById("imagem-player").click();
+});
 
 // DOM ligado a seleção da imagem para o player
 document.getElementById("imagem-player").addEventListener("change", function () {
@@ -230,7 +250,7 @@ document.getElementById("imagem-player").addEventListener("change", function () 
     const reader = new FileReader();
     reader.onload = function (e) {
         imagemSelecionada = e.target.result;
-        renderPreviewCard();
+        document.getElementById("preview-avatar").src = imagemSelecionada;
     };
     reader.readAsDataURL(arquivo);
 });
@@ -301,13 +321,23 @@ document.getElementById('btn-criar').onclick = () => {
     const form = document.getElementById('criando-player');
     form.reset();
     imagemSelecionada = "images/generic-icon.png";
+    document.getElementById("preview-avatar").src = imagemSelecionada;
 
     const vidaAtualInput = document.getElementById('vida-atual');
+    const removeP = document.getElementById('remove-p');
     vidaAtualInput.style.display = 'none';
+    removeP.style.display = 'none';
     vidaAtualInput.value = '';
 
+    const previewStatus = document.getElementById('preview-status');
+    if (previewStatus) {
+        previewStatus.textContent = 'Sem status';
+    }
+
     validarFormularioPlayer();
-    renderPreviewCard();
+    ajustarWidth();
+    atualizarBordaModal();
+    atualizarVidaModal();
     abrirModal('criando-player');
 };
 
@@ -317,3 +347,14 @@ document.getElementById('cancelar').onclick = () => {
     fecharModal('criando-player');
     validarFormularioPlayer();
 };
+
+// TESTE TESTE TESTE
+// document.getElementById('teste-lado').value = player.aliado ? '1' : '2';
+// if (testeLado == 1) {
+//     document.getElementsByClassName('teste-card').classList.add('teste-card-aliado');
+//     document.getElementsByClassName('teste-card').classList.remove('teste-card-inimigo');
+// } else if (testeLado == 2) {
+//     document.getElementsByClassName('teste-card').classList.add('teste-card-inimigo');
+//     document.getElementsByClassName('teste-card').classList.remove('teste-card-aliado');
+// }
+

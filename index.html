@@ -30,7 +30,7 @@
             <button id="btn-combate">Iniciar Combate</button>
         </section>
     </section>
-
+    
     <!-- COMBATE -->
     <section id="combate">
         <h2 id="rodada">Rodada 0</h2>
@@ -67,22 +67,42 @@
 
 <!-- MODAL PLAYER -->
 <form id="criando-player" class="modal">
-    <article id="preview-card" class="player-card"></article>
-    <div class="editor-fields">
-        <input type="text" id="nome" placeholder="Nome" required>
-        <input type="number" id="vida" placeholder="Vida" required>
-        <input type="number" id="vida-atual" placeholder="Vida Atual">
-        <input type="number" id="iniciativa" placeholder="Iniciativa" required>
-        <input type="file" id="imagem-player" accept="image/*">
-        <select id="lado">
-            <option value="1">Aliado</option>
-            <option value="2">Inimigo</option>
-        </select>
-
+    <article id="preview-card"></article>
+    <article class="modal-player-card">
+        <div class="modal-player-header">
+            <div class="modal-player-avatar">
+                <img id="preview-avatar" src="images/generic-icon.png">
+                <input type="file" id="imagem-player" accept="image/*">
+            </div>
+            <div class="modal-player-info">
+                <h3><input type="text" id="nome" placeholder="Nome" required></h3>
+                <div class="hp-text">
+                    <input type="number" id="vida-atual" placeholder="-" max="999" min="0"><span id="remove-p">/</span>
+                    <input type="number" id="vida" placeholder="0" max="999" min="0" required> <span>HP</span>
+                </div>
+                <div class="barra-vida-modal">
+                    <span id="preview-barra-vida"></span>
+                </div>
+                <div class="status-modal" id="preview-status">
+                    Sem status
+                </div>
+                <div class="lado-container">
+                    <select id="lado">
+                        <option value="1">Aliado</option>
+                        <option value="2">Inimigo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="iniciativa-container">
+                <input type="number" id="iniciativa" placeholder="0" required>
+            </div>
+        </div>
+    </article>
+    <article id="btn-modal">
         <button type="submit" id="salvar">Salvar</button>
         <button type="button" id="cancelar">Cancelar</button>
         <button type="button" id="deletar-player">Deletar</button>
-    </div>
+    </article>
 </form>
 
 <!-- MODAL ATAQUE -->
