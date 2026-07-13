@@ -168,14 +168,15 @@
 
 @media (max-width: 768px) {
 
-    /* grid mais flexível (melhor no celular) */
+    /* grid com 1 item por linha para evitar que os cards se achatem */
     #Aliados, #Inimigos {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 12px;
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .player-card {
         width: 100%;
+        max-width: 100%;
     }
 }
 
