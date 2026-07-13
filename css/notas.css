@@ -98,7 +98,7 @@
 
     /* botão seta vai para o outro lado */
     #toggle-notas {
-        top: 20px;
+        top: 140px; /* Evita sobreposição com o carrossel de combate */
         height: 80px;
         width: 48px;
 

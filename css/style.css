@@ -8,13 +8,14 @@
     padding: 20px;
 }
 
-/* BODY */
-body {
+/* HTML E BODY */
+html, body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: #1b1b1b;
     color: #eee;
     margin: 0;
     overflow-x: hidden;
+    width: 100%;
 }
 
 /* TITULOS */
@@ -98,5 +99,25 @@ input, select {
 
     #layout {
         transition: margin-left 0.3s ease;
+    }
+}
+
+/* MODAIS RESPONSIVOS E BOTÕES EM MÓDULO VERTICAL NO MOBILE */
+@media (max-width: 768px) {
+    .modal {
+        width: 92vw;
+        max-width: 400px;
+        padding: 20px;
+        box-sizing: border-box;
+        top: 25%;
+        transform: translate(-50%, -25%);
+    }
+
+    .modal button:not(#btn-modal button) {
+        width: 100%;
+        margin: 8px 0 0 0;
+        padding: 12px 8px;
+        box-sizing: border-box;
+        display: block;
     }
 }

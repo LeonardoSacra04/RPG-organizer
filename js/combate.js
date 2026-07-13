@@ -1,3 +1,23 @@
+// cria elementos persistentes no carrossel de turnos
+function inicializarCarouselDOM() {
+    const container = document.getElementById("turno-carousel");
+    if (!container) return;
+    container.innerHTML = "";
+    delete container.dataset.prevTurn;
+
+    jogo.carouselSlots = [];
+
+    for (let i = -2; i <= 2; i++) {
+        const card = document.createElement("div");
+        card.className = "turn-slot slot-hidden-right"; // começa oculto na direita
+        container.appendChild(card);
+        jogo.carouselSlots.push({
+            el: card,
+            offset: i
+        });
+    }
+}
+
 // inicia o combate
 function iniciarCombate() {
     jogo.modoEdicao = null;
@@ -19,8 +39,10 @@ function iniciarCombate() {
     document.body.classList.add('modo-combate');
     document.getElementById('botoes').style.display = 'none';
 
+    inicializarCarouselDOM();
     renderRodada();
     renderPlayers();
+    atualizarCarouselTurno(false);
 }
 
 // finaliza o combate
@@ -29,6 +51,14 @@ function finalizarCombate() {
     jogo.ordemTurno = [];
     jogo.turno = 0;
     jogo.rodada = 1;
+
+    // Limpa os slots do carrossel do DOM
+    const container = document.getElementById("turno-carousel");
+    if (container) {
+        container.innerHTML = "";
+        delete container.dataset.prevTurn;
+    }
+    delete jogo.carouselSlots;
 
     document.body.classList.remove('modo-combate');
     document.getElementById('botoes').style.display = 'block';
@@ -43,6 +73,14 @@ function finalizarCombate() {
 function proximoTurno() {
     if (!jogo.emCombate) return;
 
+    // Evita loop infinito se todos estiverem mortos
+    const vivos = jogo.ordemTurno.filter(x => x.player.vivo);
+    if (vivos.length === 0) {
+        alert("Todos os personagens estão mortos!");
+        finalizarCombate();
+        return;
+    }
+
     do {
         jogo.turno++;
         if (jogo.turno >= jogo.ordemTurno.length) {
@@ -53,6 +91,104 @@ function proximoTurno() {
 
     renderRodada();
     renderPlayers();
+    atualizarCarouselTurno();
+}
+
+function atualizarCarouselTurno(animar = true) {
+    const container = document.getElementById("turno-carousel");
+    if (!container || !jogo.emCombate || !jogo.carouselSlots || jogo.ordemTurno.length === 0) return;
+
+    const N = jogo.ordemTurno.length;
+
+    // Calcular o deslocamento de turno (turnShift) para pular transições absurdas no wrap-around
+    let turnShift = 0;
+    const prevTurnStr = container.dataset.prevTurn;
+    if (prevTurnStr !== undefined && animar) {
+        const prevTurn = parseInt(prevTurnStr, 10);
+        turnShift = jogo.turno - prevTurn;
+        // Normaliza o shift no intervalo [-Math.floor(N/2), N - Math.floor(N/2) - 1]
+        const halfN = Math.floor(N / 2);
+        turnShift = ((turnShift + halfN) % N + N) % N - halfN;
+    }
+    container.dataset.prevTurn = jogo.turno;
+
+    jogo.carouselSlots.forEach(slot => {
+        const oldOffset = slot.offset;
+        
+        // Se animar e houver turnShift, calcula o novo offset com wrap circular de tamanho 5
+        let newOffset = oldOffset;
+        if (animar && turnShift !== 0) {
+            newOffset = ((oldOffset - turnShift + 2) % 5 + 5) % 5 - 2;
+        }
+        slot.offset = newOffset;
+
+        // Encontra o player correspondente para este offset
+        const playerIdx = ((jogo.turno + newOffset) % N + N) % N;
+        const item = jogo.ordemTurno[playerIdx];
+        const p = item.player;
+
+        // Determina a classe correspondente ao offset, aplicando as regras de ocultação inicial
+        let className = "";
+        if (newOffset === -2) {
+            if (jogo.rodada === 1 && jogo.turno <= 1) {
+                className = "slot-hidden-left";
+            } else {
+                className = "slot--2";
+            }
+        } else if (newOffset === -1) {
+            if (jogo.rodada === 1 && jogo.turno === 0) {
+                className = "slot-hidden-left";
+            } else {
+                className = "slot--1";
+            }
+        } else if (newOffset === 0) {
+            className = "slot-0";
+        } else if (newOffset === 1) {
+            className = "slot-1";
+        } else if (newOffset === 2) {
+            className = "slot-2";
+        }
+
+        // Detecta se esse slot sofreu um salto (wrap) e precisa pular a animação
+        let skipTransition = false;
+        if (!animar) {
+            skipTransition = true;
+        } else {
+            const actualChange = newOffset - oldOffset;
+            if (actualChange !== -turnShift) {
+                skipTransition = true;
+            }
+        }
+
+        const card = slot.el;
+
+        if (skipTransition) {
+            card.style.transition = "none";
+        } else {
+            card.style.transition = "";
+        }
+
+        // Atualiza conteúdo
+        card.innerHTML = `
+            <img src="${p.imagem}">
+            <span>${p.nome}</span>
+        `;
+
+        // Atualiza classes do slot
+        card.className = `turn-slot ${className}`;
+        card.classList.toggle("morto", !p.vivo);
+
+        if (skipTransition) {
+            // Força reflow instantâneo
+            card.offsetHeight;
+            // Restaura transição no frame seguinte
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    card.style.transition = "";
+                });
+            });
+        }
+    });
 }
 
 // abre campo para definir a ação do ataque
@@ -107,6 +243,10 @@ function confirmarAtaque() {
 
     fecharModal('modal-ataque');
     renderPlayers();
+
+    if (jogo.emCombate) {
+        atualizarCarouselTurno(true);
+    }
 }
 
 // abre campo para definir a ação da remoção de status
@@ -198,6 +338,10 @@ function tentarReviver(player) {
 
     salvarJogo();
     renderPlayers();
+
+    if (jogo.emCombate) {
+        atualizarCarouselTurno(true);
+    }
 
     adicionarLog(`${player.nome} foi revivido com 1 HP!`, 'sistema');
 }

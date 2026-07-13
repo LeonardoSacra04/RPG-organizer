@@ -9,6 +9,7 @@
     display: flex;
     gap: 20px;
     align-items: flex-start;
+    padding-top: 140px; /* Espaço para o carrossel flutuante no topo */
 }
 
 .modo-combate .player-card {
@@ -88,6 +89,7 @@
     /* layout volta a ser coluna */
     .modo-combate #layout {
         flex-direction: column;
+        padding-top: 120px; /* Menor espaçamento no mobile */
     }
 
     /* players ocupa tudo */
@@ -99,5 +101,181 @@
     .modo-combate #combate {
         width: 100%;
         margin-top: 15px;
+    }
+}
+
+/* ============================
+   ANIMAÇÃO DE TROCA DE TURNO (CAROUSEL ROTATIVO)
+============================= */
+
+#turno-carousel {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 75px; /* Centralizado verticalmente na área reservada de 140px */
+    width: 520px;
+    height: 100px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(18, 18, 18, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+body.modo-combate #turno-carousel {
+    display: block;
+}
+
+.turn-slot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center;
+    transition: 
+        transform .6s cubic-bezier(.25, 1, .5, 1),
+        opacity .6s ease,
+        filter .6s ease;
+}
+
+.turn-slot img {
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.turn-slot span {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* ESTADO MORTO NO CARROSSEL */
+.turn-slot.morto img {
+    filter: grayscale(100%) contrast(80%);
+    border-color: rgba(244, 67, 54, 0.5);
+    box-shadow: none;
+}
+.turn-slot.morto span {
+    color: #f44336;
+    text-decoration: line-through;
+}
+
+/* POSICIONAMENTO DOS SLOTS */
+
+/* slot-0: JOGADOR ATUAL */
+.slot-0 {
+    transform: translate(-50%, -50%) scale(1.25);
+    z-index: 10;
+    opacity: 1;
+}
+.slot-0 img {
+    border-color: #ffd54f;
+    box-shadow: 0 0 12px rgba(255, 213, 79, 0.8);
+}
+.slot-0 span {
+    color: #ffd54f;
+    font-weight: 800;
+}
+
+/* slot-1 e slot--1: PRÓXIMO / ANTERIOR */
+.slot-1 {
+    transform: translate(calc(-50% + 110px), -50%) scale(0.9);
+    z-index: 5;
+    opacity: 0.8;
+}
+.slot--1 {
+    transform: translate(calc(-50% - 110px), -50%) scale(0.9);
+    z-index: 5;
+    opacity: 0.8;
+}
+
+/* slot-2 e slot--2: SEGUNDO PRÓXIMO / SEGUNDO ANTERIOR */
+.slot-2 {
+    transform: translate(calc(-50% + 200px), -50%) scale(0.7);
+    z-index: 2;
+    opacity: 0.45;
+}
+.slot--2 {
+    transform: translate(calc(-50% - 200px), -50%) scale(0.7);
+    z-index: 2;
+    opacity: 0.45;
+}
+
+/* SLOTS OCULTOS PARA TRANSIÇÃO SUAVE */
+.slot-hidden-left {
+    transform: translate(calc(-50% - 290px), -50%) scale(0.5);
+    z-index: 1;
+    opacity: 0;
+}
+.slot-hidden-right {
+    transform: translate(calc(-50% + 290px), -50%) scale(0.5);
+    z-index: 1;
+    opacity: 0;
+}
+
+/* RESPONSIVIDADE PARA TELAS MENORES */
+@media (max-width: 560px) {
+    #turno-carousel {
+        width: 320px;
+        height: 90px;
+        top: 65px;
+    }
+    
+    .turn-slot {
+        width: 60px;
+    }
+    
+    .turn-slot img {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .turn-slot span {
+        font-size: 0.65rem;
+    }
+    
+    .slot-1 {
+        transform: translate(calc(-50% + 70px), -50%) scale(0.9);
+    }
+    .slot--1 {
+        transform: translate(calc(-50% - 70px), -50%) scale(0.9);
+    }
+    
+    .slot-2 {
+        transform: translate(calc(-50% + 120px), -50%) scale(0.7);
+        opacity: 0.3;
+    }
+    .slot--2 {
+        transform: translate(calc(-50% - 120px), -50%) scale(0.7);
+        opacity: 0.3;
+    }
+    
+    .slot-hidden-left {
+        transform: translate(calc(-50% - 175px), -50%) scale(0.5);
+    }
+    .slot-hidden-right {
+        transform: translate(calc(-50% + 175px), -50%) scale(0.5);
     }
 }
